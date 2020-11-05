@@ -1,7 +1,4 @@
-﻿using Android.Support.Design.BottomNavigation;
-using Android.Support.Design.Widget;
-using Android.Views;
-using Android.Widget;
+﻿using Android.Widget;
 using Bit.Droid.Effects;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
@@ -13,7 +10,7 @@ namespace Bit.Droid.Effects
     {
         protected override void OnAttached()
         {
-            if(Control is TextView textView)
+            if (Control is TextView textView)
             {
                 textView.SetTextIsSelectable(true);
             }

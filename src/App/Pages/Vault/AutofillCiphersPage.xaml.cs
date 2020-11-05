@@ -22,7 +22,6 @@ namespace Bit.App.Pages
             InitializeComponent();
             _vm = BindingContext as AutofillCiphersPageViewModel;
             _vm.Page = this;
-            _fab.Clicked = AddButton_Clicked;
             _vm.Init(appOptions);
 
             _platformUtilsService = ServiceContainer.Resolve<IPlatformUtilsService>("platformUtilsService");
@@ -37,7 +36,7 @@ namespace Bit.App.Pages
                 {
                     await _vm.LoadAsync();
                 }
-                catch(Exception e) when(e.Message.Contains("No key."))
+                catch (Exception e) when(e.Message.Contains("No key."))
                 {
                     await Task.Delay(1000);
                     await _vm.LoadAsync();
@@ -48,11 +47,11 @@ namespace Bit.App.Pages
         private async void RowSelected(object sender, SelectedItemChangedEventArgs e)
         {
             ((ListView)sender).SelectedItem = null;
-            if(!DoOnce())
+            if (!DoOnce())
             {
                 return;
             }
-            if(e.SelectedItem is GroupingsPageListItem item && item.Cipher != null)
+            if (e.SelectedItem is GroupingsPageListItem item && item.Cipher != null)
             {
                 await _vm.SelectCipherAsync(item.Cipher, item.FuzzyAutofill);
             }
@@ -60,11 +59,11 @@ namespace Bit.App.Pages
 
         private async void AddButton_Clicked(object sender, System.EventArgs e)
         {
-            if(!DoOnce())
+            if (!DoOnce())
             {
                 return;
             }
-            if(_appOptions.FillType.HasValue && _appOptions.FillType != CipherType.Login)
+            if (_appOptions.FillType.HasValue && _appOptions.FillType != CipherType.Login)
             {
                 var pageForOther = new AddEditPage(type: _appOptions.FillType, fromAutofill: true);
                 await Navigation.PushModalAsync(new NavigationPage(pageForOther));
@@ -79,12 +78,6 @@ namespace Bit.App.Pages
         {
             var page = new CiphersPage(null, autofillUrl: _vm.Uri);
             Application.Current.MainPage = new NavigationPage(page);
-            _platformUtilsService.ShowToast("info", null,
-                string.Format(AppResources.BitwardenAutofillServiceSearch, _vm.Name),
-                new System.Collections.Generic.Dictionary<string, object>
-                {
-                    ["longDuration"] = true
-                });
         }
     }
 }

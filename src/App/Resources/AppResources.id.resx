@@ -518,23 +518,29 @@
   <data name="Lock" xml:space="preserve">
     <value>Kunci</value>
   </data>
-  <data name="LockOption15Minutes" xml:space="preserve">
-    <value>15 menit</value>
+  <data name="FifteenMinutes" xml:space="preserve">
+    <value>15 minutes</value>
   </data>
-  <data name="LockOption1Hour" xml:space="preserve">
-    <value>1 jam</value>
+  <data name="OneHour" xml:space="preserve">
+    <value>1 hour</value>
   </data>
-  <data name="LockOption1Minute" xml:space="preserve">
+  <data name="OneMinute" xml:space="preserve">
     <value>1 menit</value>
   </data>
-  <data name="LockOption4Hours" xml:space="preserve">
-    <value>4 jam</value>
+  <data name="FourHours" xml:space="preserve">
+    <value>4 hours</value>
   </data>
-  <data name="LockOptionImmediately" xml:space="preserve">
-    <value>Segera</value>
+  <data name="Immediately" xml:space="preserve">
+    <value>Immediately</value>
   </data>
-  <data name="LockOptions" xml:space="preserve">
-    <value>Pilihan Penguncian</value>
+  <data name="VaultTimeout" xml:space="preserve">
+    <value>Vault Timeout</value>
+  </data>
+  <data name="VaultTimeoutAction" xml:space="preserve">
+    <value>Vault Timeout Action</value>
+  </data>
+  <data name="VaultTimeoutLogOutConfirmation" xml:space="preserve">
+    <value>Logging out will remove all access to your vault and requires online authentication after the timeout period. Are you sure you want to use this setting?</value>
   </data>
   <data name="LoggingIn" xml:space="preserve">
     <value>Sedang masuk...</value>
@@ -728,8 +734,8 @@
     <value>Tidak ada item di brankas Anda untuk {0}.</value>
     <comment>This is used for the autofill service. ex. "There are no items in your vault for twitter.com".</comment>
   </data>
-  <data name="BitwardenAutofillServiceNotification" xml:space="preserve">
-    <value>Ketika Anda melihat notifikasi pengisian otomatis bitwarden, Anda dapat mengetuknya untuk meluncurkan layanan pengisian otomatis.</value>
+  <data name="BitwardenAutofillServiceOverlay" xml:space="preserve">
+    <value>When you select an input field and see a Bitwarden auto-fill overlay, you can tap it to launch the auto-fill service.</value>
   </data>
   <data name="BitwardenAutofillServiceNotificationContent" xml:space="preserve">
     <value>Ketuk notifikasi ini untuk mengisi info masuk secara otomatis dari brankas Anda.</value>
@@ -778,24 +784,6 @@
   </data>
   <data name="ShareVault" xml:space="preserve">
     <value>Bagikan Brankas Anda</value>
-  </data>
-  <data name="AutofillPasswordField" xml:space="preserve">
-    <value>Pindai Ketika Fokus ke Kolom Kata Sandi</value>
-  </data>
-  <data name="AutofillPasswordFieldDescription" xml:space="preserve">
-    <value>Hanya pindai layat untuk kolom dan tampilkan notifikasi pengisian otomatis setiap kali Anda memilih kolom kata sandi. Setelan ini mungkin dapat membantu menghemat baterai.</value>
-  </data>
-  <data name="AutofillPersistNotification" xml:space="preserve">
-    <value>Notikasi Tetap</value>
-  </data>
-  <data name="AutofillPersistNotificationDescription" xml:space="preserve">
-    <value>Selalu munculkan notifikasi pengisian otomatis dan hanya memindai kolom setelah mencoba pengisian otomatis. Setelan ini mungkin dapat membantu menghemat baterai.</value>
-  </data>
-  <data name="AutofillAlways" xml:space="preserve">
-    <value>Selalu Pindai</value>
-  </data>
-  <data name="AutofillAlwaysDescription" xml:space="preserve">
-    <value>Selalu pindai layar untuk kolom dan hanya munculkan notifikasi pengisian otomatis jika kolom kata sandi ditemukan. Ini adalah setelan bawaan.</value>
   </data>
   <data name="CannotOpenApp" xml:space="preserve">
     <value>Tidak dapat membuka aplikasi {0}.</value>
@@ -1149,6 +1137,9 @@
   <data name="NoItemsFolder" xml:space="preserve">
     <value>Tidak ada item di folder ini.</value>
   </data>
+  <data name="NoItemsTrash" xml:space="preserve">
+    <value>There are no items in the trash.</value>
+  </data>
   <data name="AutofillAccessibilityService" xml:space="preserve">
     <value>Layanan Aksesibilitas Isi Otomatis</value>
   </data>
@@ -1448,11 +1439,8 @@
   <data name="Unlock" xml:space="preserve">
     <value>Unlock</value>
   </data>
-  <data name="LockOption30Minutes" xml:space="preserve">
-    <value>30 menit</value>
-  </data>
-  <data name="LockOption5Minutes" xml:space="preserve">
-    <value>5 menit</value>
+  <data name="ThirtyMinutes" xml:space="preserve">
+    <value>30 minutes</value>
   </data>
   <data name="SetPINDescription" xml:space="preserve">
     <value>Set your PIN code for unlocking Bitwarden. Your PIN settings will be reset if you ever fully log out of the application.</value>
@@ -1477,9 +1465,6 @@
   </data>
   <data name="FiveMinutes" xml:space="preserve">
     <value>5 menit</value>
-  </data>
-  <data name="OneMinute" xml:space="preserve">
-    <value>1 menit</value>
   </data>
   <data name="TenSeconds" xml:space="preserve">
     <value>10 detik</value>
@@ -1550,8 +1535,8 @@
   <data name="DisableSavePromptDescription" xml:space="preserve">
     <value>"Saran Simpan" secara otomatis meminta anda untuk menyimpan item baru ke brankas anda setiap kali anda memasukkannya untuk pertama kali.</value>
   </data>
-  <data name="LockOptionOnRestart" xml:space="preserve">
-    <value>Saat Aplikasi Memulai Ulang</value>
+  <data name="OnRestart" xml:space="preserve">
+    <value>On App Restart</value>
   </data>
   <data name="AutofillServiceNotEnabled" xml:space="preserve">
     <value>Isi-otomatis memudahkan untuk mengakses brankas Bitwarden anda dengan aman dari situs web dan aplikasi lain. Sepertinya anda belum mengaktifkan layanan pengisian-otomatis untuk Bitwarden. Aktifkan pengisian-otomatis untuk Bitwarden dari layar "Pengaturan".</value>
@@ -1579,12 +1564,171 @@
     <value>Your login session has expired.</value>
   </data>
   <data name="BiometricsDirection" xml:space="preserve">
-    <value>Use biometrics to verify.</value>
+    <value>Biometric Verification</value>
   </data>
   <data name="Biometrics" xml:space="preserve">
     <value>Biometrics</value>
   </data>
   <data name="UseBiometricsToUnlock" xml:space="preserve">
     <value>Use Biometrics To Unlock</value>
+  </data>
+  <data name="AccessibilityOverlayPermissionAlert" xml:space="preserve">
+    <value>Bitwarden needs attention - See "Auto-fill Accessibility Service" from Bitwarden Settings</value>
+  </data>
+  <data name="BitwardenAutofillServiceOverlayPermission" xml:space="preserve">
+    <value>3. On the Android App Settings screen for Bitwarden, go to the "Display over other apps" options (under Advanced) and tap the toggle to enable overlay support.</value>
+  </data>
+  <data name="OverlayPermission" xml:space="preserve">
+    <value>Permission</value>
+  </data>
+  <data name="BitwardenAutofillServiceOpenOverlayPermissionSettings" xml:space="preserve">
+    <value>Open Overlay Permission Settings</value>
+  </data>
+  <data name="BitwardenAutofillServiceStep3" xml:space="preserve">
+    <value>3. On the Android App Settings screen for Bitwarden, select "Display over other apps" (under "Advanced") and switch on the toggle to allow the overlay.</value>
+  </data>
+  <data name="Denied" xml:space="preserve">
+    <value>Denied</value>
+  </data>
+  <data name="Granted" xml:space="preserve">
+    <value>Granted</value>
+  </data>
+  <data name="FileFormat" xml:space="preserve">
+    <value>File Format</value>
+  </data>
+  <data name="ExportVaultMasterPasswordDescription" xml:space="preserve">
+    <value>Enter your master password to export your vault data.</value>
+  </data>
+  <data name="ExportVaultWarning" xml:space="preserve">
+    <value>This export contains your vault data in an unencrypted format. You should not store or send the exported file over unsecure channels (such as email). Delete it immediately after you are done using it.</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="ExportVaultFailure" xml:space="preserve">
+    <value>There was a problem exporting your vault.  If the problem persists, you'll need to export from the web vault.</value>
+  </data>
+  <data name="ExportVaultSuccess" xml:space="preserve">
+    <value>Vault exported successfully</value>
+  </data>
+  <data name="Clone" xml:space="preserve">
+    <value>Clone</value>
+    <comment>Clone an entity (verb).</comment>
+  </data>
+  <data name="PasswordGeneratorPolicyInEffect" xml:space="preserve">
+    <value>One or more organization policies are affecting your generator settings</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Open</value>
+    <comment>Button text for an open operation (verb).</comment>
+  </data>
+  <data name="UnableToSaveAttachment" xml:space="preserve">
+    <value>There was a problem saving this attachment. If the problem persists, you can save it from the web vault.</value>
+  </data>
+  <data name="SaveAttachmentSuccess" xml:space="preserve">
+    <value>Attachment saved successfully</value>
+  </data>
+  <data name="AutofillTileAccessibilityRequired" xml:space="preserve">
+    <value>Please enable "Auto-fill Accessibility Service" from Bitwarden Settings to use the Auto-fill tile.</value>
+  </data>
+  <data name="AutofillTileUriNotFound" xml:space="preserve">
+    <value>No password fields detected</value>
+  </data>
+  <data name="SoftDeleting" xml:space="preserve">
+    <value>Sending to trash...</value>
+    <comment>Message shown when interacting with the server</comment>
+  </data>
+  <data name="ItemSoftDeleted" xml:space="preserve">
+    <value>Item has been sent to trash.</value>
+    <comment>Confirmation message after successfully soft-deleting a login</comment>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Restore</value>
+    <comment>Restores an entity (verb).</comment>
+  </data>
+  <data name="Restoring" xml:space="preserve">
+    <value>Restoring...</value>
+    <comment>Message shown when interacting with the server</comment>
+  </data>
+  <data name="ItemRestored" xml:space="preserve">
+    <value>Item has been restored.</value>
+    <comment>Confirmation message after successfully restoring a soft-deleted item</comment>
+  </data>
+  <data name="Trash" xml:space="preserve">
+    <value>Trash</value>
+    <comment>(noun) Location of deleted items which have not yet been permanently deleted</comment>
+  </data>
+  <data name="SearchTrash" xml:space="preserve">
+    <value>Search trash</value>
+    <comment>(action prompt) Label for the search text field when viewing the trash folder</comment>
+  </data>
+  <data name="DoYouReallyWantToPermanentlyDeleteCipher" xml:space="preserve">
+    <value>Do you really want to permanently delete? This cannot be undone.</value>
+    <comment>Confirmation alert message when permanently deleteing a cipher.</comment>
+  </data>
+  <data name="DoYouReallyWantToRestoreCipher" xml:space="preserve">
+    <value>Do you really want to restore this item?</value>
+    <comment>Confirmation alert message when restoring a soft-deleted cipher.</comment>
+  </data>
+  <data name="DoYouReallyWantToSoftDeleteCipher" xml:space="preserve">
+    <value>Do you really want to send to the trash?</value>
+    <comment>Confirmation alert message when soft-deleting a cipher.</comment>
+  </data>
+  <data name="BiometricInvalidated" xml:space="preserve">
+    <value>Biometric change detected, login using Master Password to enable again.</value>
+  </data>
+  <data name="EnableSyncOnRefresh" xml:space="preserve">
+    <value>Enable sync on refresh</value>
+  </data>
+  <data name="EnableSyncOnRefreshDescription" xml:space="preserve">
+    <value>Syncing vault with pull down gesture.</value>
+  </data>
+  <data name="LogInSso" xml:space="preserve">
+    <value>Enterprise Single Sign-On</value>
+  </data>
+  <data name="LogInSsoSummary" xml:space="preserve">
+    <value>Quickly log in using your organization's single sign-on portal. Please enter your organization's identifier to begin.</value>
+  </data>
+  <data name="OrgIdentifier" xml:space="preserve">
+    <value>Organization Identifier</value>
+  </data>
+  <data name="LoginSsoError" xml:space="preserve">
+    <value>Currently unable to login with SSO</value>
+  </data>
+  <data name="SetMasterPassword" xml:space="preserve">
+    <value>Set Master Password</value>
+  </data>
+  <data name="SetMasterPasswordSummary" xml:space="preserve">
+    <value>In order to complete logging in with SSO, please set a master password to access and protect your vault.</value>
+  </data>
+  <data name="MasterPasswordPolicyInEffect" xml:space="preserve">
+    <value>One or more organization policies require your master password to meet the following requirements:</value>
+  </data>
+  <data name="PolicyInEffectMinComplexity" xml:space="preserve">
+    <value>Minimum complexity score of {0}</value>
+  </data>
+  <data name="PolicyInEffectMinLength" xml:space="preserve">
+    <value>Minimum length of {0}</value>
+  </data>
+  <data name="PolicyInEffectUppercase" xml:space="preserve">
+    <value>Contain one or more uppercase characters</value>
+  </data>
+  <data name="PolicyInEffectLowercase" xml:space="preserve">
+    <value>Contain one or more lowercase characters</value>
+  </data>
+  <data name="PolicyInEffectNumbers" xml:space="preserve">
+    <value>Contain one or more numbers</value>
+  </data>
+  <data name="PolicyInEffectSpecial" xml:space="preserve">
+    <value>Contain one or more of the following special characters: {0}</value>
+  </data>
+  <data name="MasterPasswordPolicyValidationTitle" xml:space="preserve">
+    <value>Invalid Password</value>
+  </data>
+  <data name="MasterPasswordPolicyValidationMessage" xml:space="preserve">
+    <value>Password does not meet organization requirements. Please check the policy information and try again.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading</value>
   </data>
 </root>

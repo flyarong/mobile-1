@@ -1,6 +1,7 @@
 ﻿using Bit.Core.Abstractions;
 using Bit.Core.Utilities;
 using System;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Bit.App.Pages
@@ -17,16 +18,15 @@ namespace Bit.App.Pages
             InitializeComponent();
             _vm = BindingContext as RegisterPageViewModel;
             _vm.Page = this;
-            _vm.RegistrationSuccess = async () =>
+            _vm.RegistrationSuccess = () => Device.BeginInvokeOnMainThread(async () => await RegistrationSuccessAsync(homePage));
+            _vm.CloseAction = async () =>
             {
-                if(homePage != null)
-                {
-                    await homePage.DismissRegisterPageAndLogInAsync(_vm.Email);
-                }
+                _messagingService.Send("showStatusBar", false);
+                await Navigation.PopModalAsync();
             };
             MasterPasswordEntry = _masterPassword;
             ConfirmMasterPasswordEntry = _confirmMasterPassword;
-            if(Device.RuntimePlatform == Device.Android)
+            if (Device.RuntimePlatform == Device.Android)
             {
                 ToolbarItems.RemoveAt(0);
             }
@@ -50,18 +50,25 @@ namespace Bit.App.Pages
 
         private async void Submit_Clicked(object sender, EventArgs e)
         {
-            if(DoOnce())
+            if (DoOnce())
             {
                 await _vm.SubmitAsync();
             }
         }
-
-        private async void Close_Clicked(object sender, EventArgs e)
+        
+        private async Task RegistrationSuccessAsync(HomePage homePage)
         {
-            if(DoOnce())
+            if (homePage != null)
             {
-                _messagingService.Send("showStatusBar", false);
-                await Navigation.PopModalAsync();
+                await homePage.DismissRegisterPageAndLogInAsync(_vm.Email);
+            }
+        }
+
+        private void Close_Clicked(object sender, EventArgs e)
+        {
+            if (DoOnce())
+            {
+                _vm.CloseAction();
             }
         }
     }

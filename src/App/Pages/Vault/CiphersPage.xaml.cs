@@ -16,22 +16,27 @@ namespace Bit.App.Pages
         private bool _hasFocused;
 
         public CiphersPage(Func<CipherView, bool> filter, bool folder = false, bool collection = false,
-            bool type = false, string autofillUrl = null)
+            bool type = false, string autofillUrl = null, bool deleted = false)
         {
             InitializeComponent();
             _vm = BindingContext as CiphersPageViewModel;
             _vm.Page = this;
             _vm.Filter = filter;
             _vm.AutofillUrl = _autofillUrl = autofillUrl;
-            if(folder)
+            _vm.Deleted = deleted;
+            if (deleted)
+            {
+                _vm.PageTitle = AppResources.SearchTrash;
+            }
+            else if (folder)
             {
                 _vm.PageTitle = AppResources.SearchFolder;
             }
-            else if(collection)
+            else if (collection)
             {
                 _vm.PageTitle = AppResources.SearchCollection;
             }
-            else if(type)
+            else if (type)
             {
                 _vm.PageTitle = AppResources.SearchType;
             }
@@ -40,7 +45,7 @@ namespace Bit.App.Pages
                 _vm.PageTitle = AppResources.SearchVault;
             }
 
-            if(Device.RuntimePlatform == Device.iOS)
+            if (Device.RuntimePlatform == Device.iOS)
             {
                 ToolbarItems.Add(_closeItem);
                 _searchBar.Placeholder = AppResources.Search;
@@ -60,7 +65,7 @@ namespace Bit.App.Pages
         {
             base.OnAppearing();
             await _vm.InitAsync();
-            if(!_hasFocused)
+            if (!_hasFocused)
             {
                 _hasFocused = true;
                 RequestFocus(_searchBar);
@@ -71,11 +76,11 @@ namespace Bit.App.Pages
         {
             var oldLength = e.OldTextValue?.Length ?? 0;
             var newLength = e.NewTextValue?.Length ?? 0;
-            if(oldLength < 2 && newLength < 2 && oldLength < newLength)
+            if (oldLength < 2 && newLength < 2 && oldLength < newLength)
             {
                 return;
             }
-            _vm.Search(e.NewTextValue, 500);
+            _vm.Search(e.NewTextValue, 200);
         }
 
         private void SearchBar_SearchButtonPressed(object sender, EventArgs e)
@@ -90,7 +95,7 @@ namespace Bit.App.Pages
 
         protected override bool OnBackButtonPressed()
         {
-            if(string.IsNullOrWhiteSpace(_autofillUrl))
+            if (string.IsNullOrWhiteSpace(_autofillUrl))
             {
                 return false;
             }
@@ -100,11 +105,11 @@ namespace Bit.App.Pages
 
         private void GoBack()
         {
-            if(!DoOnce())
+            if (!DoOnce())
             {
                 return;
             }
-            if(string.IsNullOrWhiteSpace(_autofillUrl))
+            if (string.IsNullOrWhiteSpace(_autofillUrl))
             {
                 Navigation.PopModalAsync(false);
             }
@@ -117,12 +122,12 @@ namespace Bit.App.Pages
         private async void RowSelected(object sender, SelectedItemChangedEventArgs e)
         {
             ((ListView)sender).SelectedItem = null;
-            if(!DoOnce())
+            if (!DoOnce())
             {
                 return;
             }
 
-            if(e.SelectedItem is CipherView cipher)
+            if (e.SelectedItem is CipherView cipher)
             {
                 await _vm.SelectCipherAsync(cipher);
             }

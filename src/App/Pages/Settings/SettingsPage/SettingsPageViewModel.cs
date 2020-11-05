@@ -19,27 +19,35 @@ namespace Bit.App.Pages
         private readonly IDeviceActionService _deviceActionService;
         private readonly IEnvironmentService _environmentService;
         private readonly IMessagingService _messagingService;
-        private readonly ILockService _lockService;
+        private readonly IVaultTimeoutService _vaultTimeoutService;
         private readonly IStorageService _storageService;
         private readonly ISyncService _syncService;
+        private readonly IBiometricService _biometricService;
 
-        private bool _supportsFingerprint;
+        private bool _supportsBiometric;
         private bool _pin;
-        private bool _fingerprint;
+        private bool _biometric;
         private string _lastSyncDate;
-        private string _lockOptionValue;
-        private List<KeyValuePair<string, int?>> _lockOptions =
+        private string _vaultTimeoutDisplayValue;
+        private string _vaultTimeoutActionDisplayValue;
+        private List<KeyValuePair<string, int?>> _vaultTimeouts =
             new List<KeyValuePair<string, int?>>
             {
-                new KeyValuePair<string, int?>(AppResources.LockOptionImmediately, 0),
-                new KeyValuePair<string, int?>(AppResources.LockOption1Minute, 1),
-                new KeyValuePair<string, int?>(AppResources.LockOption5Minutes, 5),
-                new KeyValuePair<string, int?>(AppResources.LockOption15Minutes, 15),
-                new KeyValuePair<string, int?>(AppResources.LockOption30Minutes, 30),
-                new KeyValuePair<string, int?>(AppResources.LockOption1Hour, 60),
-                new KeyValuePair<string, int?>(AppResources.LockOption4Hours, 240),
-                new KeyValuePair<string, int?>(AppResources.LockOptionOnRestart, -1),
+                new KeyValuePair<string, int?>(AppResources.Immediately, 0),
+                new KeyValuePair<string, int?>(AppResources.OneMinute, 1),
+                new KeyValuePair<string, int?>(AppResources.FiveMinutes, 5),
+                new KeyValuePair<string, int?>(AppResources.FifteenMinutes, 15),
+                new KeyValuePair<string, int?>(AppResources.ThirtyMinutes, 30),
+                new KeyValuePair<string, int?>(AppResources.OneHour, 60),
+                new KeyValuePair<string, int?>(AppResources.FourHours, 240),
+                new KeyValuePair<string, int?>(AppResources.OnRestart, -1),
                 new KeyValuePair<string, int?>(AppResources.Never, null),
+            };
+        private List<KeyValuePair<string, string>> _vaultTimeoutActions =
+            new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>(AppResources.Lock, "lock"),
+                new KeyValuePair<string, string>(AppResources.LogOut, "logOut"),
             };
 
         public SettingsPageViewModel()
@@ -50,9 +58,10 @@ namespace Bit.App.Pages
             _deviceActionService = ServiceContainer.Resolve<IDeviceActionService>("deviceActionService");
             _environmentService = ServiceContainer.Resolve<IEnvironmentService>("environmentService");
             _messagingService = ServiceContainer.Resolve<IMessagingService>("messagingService");
-            _lockService = ServiceContainer.Resolve<ILockService>("lockService");
+            _vaultTimeoutService = ServiceContainer.Resolve<IVaultTimeoutService>("vaultTimeoutService");
             _storageService = ServiceContainer.Resolve<IStorageService>("storageService");
             _syncService = ServiceContainer.Resolve<ISyncService>("syncService");
+            _biometricService = ServiceContainer.Resolve<IBiometricService>("biometricService");
 
             GroupedItems = new ExtendedObservableCollection<SettingsPageListGroup>();
             PageTitle = AppResources.Settings;
@@ -62,19 +71,21 @@ namespace Bit.App.Pages
 
         public async Task InitAsync()
         {
-            _supportsFingerprint = await _platformUtilsService.SupportsBiometricAsync();
+            _supportsBiometric = await _platformUtilsService.SupportsBiometricAsync();
             var lastSync = await _syncService.GetLastSyncAsync();
-            if(lastSync != null)
+            if (lastSync != null)
             {
                 lastSync = lastSync.Value.ToLocalTime();
                 _lastSyncDate = string.Format("{0} {1}", lastSync.Value.ToShortDateString(),
                     lastSync.Value.ToShortTimeString());
             }
-            var option = await _storageService.GetAsync<int?>(Constants.LockOptionKey);
-            _lockOptionValue = _lockOptions.FirstOrDefault(o => o.Value == option).Key;
-            var pinSet = await _lockService.IsPinLockSetAsync();
+            var timeout = await _storageService.GetAsync<int?>(Constants.VaultTimeoutKey);
+            _vaultTimeoutDisplayValue = _vaultTimeouts.FirstOrDefault(o => o.Value == timeout).Key;
+            var action = await _storageService.GetAsync<string>(Constants.VaultTimeoutActionKey) ?? "lock";
+            _vaultTimeoutActionDisplayValue = _vaultTimeoutActions.FirstOrDefault(o => o.Value == action).Key;
+            var pinSet = await _vaultTimeoutService.IsPinLockSetAsync();
             _pin = pinSet.Item1 || pinSet.Item2;
-            _fingerprint = await _lockService.IsFingerprintLockSetAsync();
+            _biometric = await _vaultTimeoutService.IsBiometricLockSetAsync();
             BuildList();
         }
 
@@ -82,10 +93,10 @@ namespace Bit.App.Pages
         {
             var debugText = string.Format("{0}: {1} ({2})", AppResources.Version,
                 _platformUtilsService.GetApplicationVersion(), _deviceActionService.GetBuildNumber());
-            var text = string.Format("© 8bit Solutions LLC 2015-{0}\n\n{1}", DateTime.Now.Year, debugText);
+            var text = string.Format("© Bitwarden Inc. 2015-{0}\n\n{1}", DateTime.Now.Year, debugText);
             var copy = await _platformUtilsService.ShowDialogAsync(text, AppResources.Bitwarden, AppResources.Copy,
                 AppResources.Close);
-            if(copy)
+            if (copy)
             {
                 await _platformUtilsService.CopyToClipboardAsync(debugText);
             }
@@ -103,7 +114,7 @@ namespace Bit.App.Pages
             {
                 fingerprint = await _cryptoService.GetFingerprintAsync(await _userService.GetUserIdAsync());
             }
-            catch(Exception e) when(e.Message == "No public key available.")
+            catch (Exception e) when (e.Message == "No public key available.")
             {
                 return;
             }
@@ -111,7 +122,7 @@ namespace Bit.App.Pages
             var text = string.Format("{0}:\n\n{1}", AppResources.YourAccountsFingerprint, phrase);
             var learnMore = await _platformUtilsService.ShowDialogAsync(text, AppResources.FingerprintPhrase,
                 AppResources.LearnMore, AppResources.Close);
-            if(learnMore)
+            if (learnMore)
             {
                 _platformUtilsService.LaunchUri("https://help.bitwarden.com/article/fingerprint-phrase/");
             }
@@ -127,15 +138,10 @@ namespace Bit.App.Pages
             _platformUtilsService.LaunchUri("https://help.bitwarden.com/article/import-data/");
         }
 
-        public void Export()
-        {
-            _platformUtilsService.LaunchUri("https://help.bitwarden.com/article/export-your-data/");
-        }
-
         public void WebVault()
         {
             var url = _environmentService.GetWebVaultUrl();
-            if(url == null)
+            if (url == null)
             {
                 url = "https://vault.bitwarden.com";
             }
@@ -146,7 +152,7 @@ namespace Bit.App.Pages
         {
             var confirmed = await _platformUtilsService.ShowDialogAsync(AppResources.ShareVaultConfirmation,
                 AppResources.ShareVault, AppResources.Yes, AppResources.Cancel);
-            if(confirmed)
+            if (confirmed)
             {
                 _platformUtilsService.LaunchUri("https://help.bitwarden.com/article/what-is-an-organization/");
             }
@@ -156,7 +162,7 @@ namespace Bit.App.Pages
         {
             var confirmed = await _platformUtilsService.ShowDialogAsync(AppResources.TwoStepLoginConfirmation,
                 AppResources.TwoStepLogin, AppResources.Yes, AppResources.Cancel);
-            if(confirmed)
+            if (confirmed)
             {
                 _platformUtilsService.LaunchUri("https://help.bitwarden.com/article/setup-two-step-login/");
             }
@@ -166,7 +172,7 @@ namespace Bit.App.Pages
         {
             var confirmed = await _platformUtilsService.ShowDialogAsync(AppResources.ChangePasswordConfirmation,
                 AppResources.ChangeMasterPassword, AppResources.Yes, AppResources.Cancel);
-            if(confirmed)
+            if (confirmed)
             {
                 _platformUtilsService.LaunchUri("https://help.bitwarden.com/article/change-your-master-password/");
             }
@@ -176,7 +182,7 @@ namespace Bit.App.Pages
         {
             var confirmed = await _platformUtilsService.ShowDialogAsync(AppResources.LogoutConfirmation,
                 AppResources.LogOut, AppResources.Yes, AppResources.Cancel);
-            if(confirmed)
+            if (confirmed)
             {
                 _messagingService.Send("logout");
             }
@@ -184,32 +190,68 @@ namespace Bit.App.Pages
 
         public async Task LockAsync()
         {
-            await _lockService.LockAsync(true, true);
+            await _vaultTimeoutService.LockAsync(true, true);
         }
 
-        public async Task LockOptionsAsync()
+        public async Task VaultTimeoutAsync()
         {
-            var options = _lockOptions.Select(o => o.Key == _lockOptionValue ? $"✓ {o.Key}" : o.Key).ToArray();
-            var selection = await Page.DisplayActionSheet(AppResources.LockOptions, AppResources.Cancel, null, options);
-            if(selection == null || selection == AppResources.Cancel)
+            var options = _vaultTimeouts.Select(
+                o => o.Key == _vaultTimeoutDisplayValue ? $"✓ {o.Key}" : o.Key).ToArray();
+            var selection = await Page.DisplayActionSheet(AppResources.VaultTimeout,
+                AppResources.Cancel, null, options);
+            if (selection == null || selection == AppResources.Cancel)
             {
                 return;
             }
             var cleanSelection = selection.Replace("✓ ", string.Empty);
-            var selectionOption = _lockOptions.FirstOrDefault(o => o.Key == cleanSelection);
-            _lockOptionValue = selectionOption.Key;
-            await _lockService.SetLockOptionAsync(selectionOption.Value);
+            var selectionOption = _vaultTimeouts.FirstOrDefault(o => o.Key == cleanSelection);
+            _vaultTimeoutDisplayValue = selectionOption.Key;
+            await _vaultTimeoutService.SetVaultTimeoutOptionsAsync(selectionOption.Value,
+                GetVaultTimeoutActionFromKey(_vaultTimeoutActionDisplayValue));
+            BuildList();
+        }
+
+        public async Task VaultTimeoutActionAsync()
+        {
+            var options = _vaultTimeoutActions.Select(o =>
+                o.Key == _vaultTimeoutActionDisplayValue ? $"✓ {o.Key}" : o.Key).ToArray();
+            var selection = await Page.DisplayActionSheet(AppResources.VaultTimeoutAction,
+                AppResources.Cancel, null, options);
+            if (selection == null || selection == AppResources.Cancel)
+            {
+                return;
+            }
+            var cleanSelection = selection.Replace("✓ ", string.Empty);
+            if (cleanSelection == AppResources.LogOut)
+            {
+                var confirmed = await _platformUtilsService.ShowDialogAsync(AppResources.VaultTimeoutLogOutConfirmation,
+                    AppResources.Warning, AppResources.Yes, AppResources.Cancel);
+                if (!confirmed)
+                {
+                    // Reset to lock and continue process as if lock were selected
+                    cleanSelection = AppResources.Lock;
+                }
+            }
+            var selectionOption = _vaultTimeoutActions.FirstOrDefault(o => o.Key == cleanSelection);
+            var changed = _vaultTimeoutActionDisplayValue != selectionOption.Key;
+            _vaultTimeoutActionDisplayValue = selectionOption.Key;
+            await _vaultTimeoutService.SetVaultTimeoutOptionsAsync(GetVaultTimeoutFromKey(_vaultTimeoutDisplayValue),
+                selectionOption.Value);
+            if (changed)
+            {
+                _messagingService.Send("vaultTimeoutActionChanged");
+            }
             BuildList();
         }
 
         public async Task UpdatePinAsync()
         {
             _pin = !_pin;
-            if(_pin)
+            if (_pin)
             {
                 var pin = await _deviceActionService.DisplayPromptAync(AppResources.EnterPIN,
                     AppResources.SetPINDescription, null, AppResources.Submit, AppResources.Cancel, true);
-                if(!string.IsNullOrWhiteSpace(pin))
+                if (!string.IsNullOrWhiteSpace(pin))
                 {
                     var masterPassOnRestart = await _platformUtilsService.ShowDialogAsync(
                        AppResources.PINRequireMasterPasswordRestart, AppResources.UnlockWithPIN,
@@ -224,11 +266,11 @@ namespace Bit.App.Pages
                     var key = await _cryptoService.GetKeyAsync();
                     var pinProtectedKey = await _cryptoService.EncryptAsync(key.Key, pinKey);
 
-                    if(masterPassOnRestart)
+                    if (masterPassOnRestart)
                     {
                         var encPin = await _cryptoService.EncryptAsync(pin);
                         await _storageService.SaveAsync(Constants.ProtectedPin, encPin.EncryptedString);
-                        _lockService.PinProtectedKey = pinProtectedKey;
+                        _vaultTimeoutService.PinProtectedKey = pinProtectedKey;
                     }
                     else
                     {
@@ -240,39 +282,40 @@ namespace Bit.App.Pages
                     _pin = false;
                 }
             }
-            if(!_pin)
+            if (!_pin)
             {
                 await _cryptoService.ClearPinProtectedKeyAsync();
-                await _lockService.ClearAsync();
+                await _vaultTimeoutService.ClearAsync();
             }
             BuildList();
         }
 
-        public async Task UpdateFingerprintAsync()
+        public async Task UpdateBiometricAsync()
         {
-            var current = _fingerprint;
-            if(_fingerprint)
+            var current = _biometric;
+            if (_biometric)
             {
-                _fingerprint = false;
+                _biometric = false;
             }
-            else if(await _platformUtilsService.SupportsBiometricAsync())
+            else if (await _platformUtilsService.SupportsBiometricAsync())
             {
-                _fingerprint = await _platformUtilsService.AuthenticateBiometricAsync(null,
+                _biometric = await _platformUtilsService.AuthenticateBiometricAsync(null,
                     _deviceActionService.DeviceType == Core.Enums.DeviceType.Android ? "." : null);
             }
-            if(_fingerprint == current)
+            if (_biometric == current)
             {
                 return;
             }
-            if(_fingerprint)
+            if (_biometric)
             {
-                await _storageService.SaveAsync(Constants.FingerprintUnlockKey, true);
+                await _biometricService.SetupBiometricAsync();
+                await _storageService.SaveAsync(Constants.BiometricUnlockKey, true);
             }
             else
             {
-                await _storageService.RemoveAsync(Constants.FingerprintUnlockKey);
+                await _storageService.RemoveAsync(Constants.BiometricUnlockKey);
             }
-            _lockService.FingerprintLocked = false;
+            _vaultTimeoutService.BiometricLocked = false;
             await _cryptoService.ToggleKeyAsync();
             BuildList();
         }
@@ -281,9 +324,9 @@ namespace Bit.App.Pages
         {
             var doUpper = Device.RuntimePlatform != Device.Android;
             var autofillItems = new List<SettingsPageListItem>();
-            if(Device.RuntimePlatform == Device.Android)
+            if (Device.RuntimePlatform == Device.Android)
             {
-                if(_deviceActionService.SupportsAutofillService())
+                if (_deviceActionService.SupportsAutofillService())
                 {
                     autofillItems.Add(new SettingsPageListItem
                     {
@@ -304,7 +347,7 @@ namespace Bit.App.Pages
             }
             else
             {
-                if(_deviceActionService.SystemMajorVersion() >= 12)
+                if (_deviceActionService.SystemMajorVersion() >= 12)
                 {
                     autofillItems.Add(new SettingsPageListItem { Name = AppResources.PasswordAutofill });
                 }
@@ -317,7 +360,12 @@ namespace Bit.App.Pages
             };
             var securityItems = new List<SettingsPageListItem>
             {
-                new SettingsPageListItem { Name = AppResources.LockOptions, SubLabel = _lockOptionValue },
+                new SettingsPageListItem { Name = AppResources.VaultTimeout, SubLabel = _vaultTimeoutDisplayValue },
+                new SettingsPageListItem 
+                {
+                    Name = AppResources.VaultTimeoutAction,
+                    SubLabel = _vaultTimeoutActionDisplayValue
+                },
                 new SettingsPageListItem
                 {
                     Name = AppResources.UnlockWithPIN,
@@ -326,24 +374,20 @@ namespace Bit.App.Pages
                 new SettingsPageListItem { Name = AppResources.LockNow },
                 new SettingsPageListItem { Name = AppResources.TwoStepLogin }
             };
-            if(_supportsFingerprint || _fingerprint)
+            if (_supportsBiometric || _biometric)
             {
-                var fingerprintName = AppResources.Fingerprint;
-                if(Device.RuntimePlatform == Device.iOS)
+                var biometricName = AppResources.Biometrics;
+                if (Device.RuntimePlatform == Device.iOS)
                 {
-                    fingerprintName = _deviceActionService.SupportsFaceBiometric() ? AppResources.FaceID :
+                    biometricName = _deviceActionService.SupportsFaceBiometric() ? AppResources.FaceID :
                         AppResources.TouchID;
-                }
-                else if(Device.RuntimePlatform == Device.Android && _deviceActionService.UseNativeBiometric())
-                {
-                    fingerprintName = AppResources.Biometrics;
                 }
                 var item = new SettingsPageListItem
                 {
-                    Name = string.Format(AppResources.UnlockWith, fingerprintName),
-                    SubLabel = _fingerprint ? AppResources.Enabled : AppResources.Disabled
+                    Name = string.Format(AppResources.UnlockWith, biometricName),
+                    SubLabel = _biometric ? AppResources.Enabled : AppResources.Disabled
                 };
-                securityItems.Insert(1, item);
+                securityItems.Insert(2, item);
             }
             var accountItems = new List<SettingsPageListItem>
             {
@@ -374,6 +418,16 @@ namespace Bit.App.Pages
                 new SettingsPageListGroup(toolsItems, AppResources.Tools, doUpper),
                 new SettingsPageListGroup(otherItems, AppResources.Other, doUpper)
             });
+        }
+
+        private string GetVaultTimeoutActionFromKey(string key)
+        {
+            return _vaultTimeoutActions.FirstOrDefault(o => o.Key == key).Value;
+        }
+
+        private int? GetVaultTimeoutFromKey(string key)
+        {
+            return _vaultTimeouts.FirstOrDefault(o => o.Key == key).Value;
         }
     }
 }

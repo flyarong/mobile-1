@@ -13,6 +13,7 @@ namespace Bit.App.Abstractions
         Task ShowLoadingAsync(string text);
         Task HideLoadingAsync();
         bool OpenFile(byte[] fileData, string id, string fileName);
+        bool SaveFile(byte[] fileData, string id, string fileName, string contentUri);
         bool CanOpenFile(string fileName);
         Task ClearCacheAsync();
         Task SelectFileAsync();
@@ -22,15 +23,13 @@ namespace Bit.App.Abstractions
         void RateApp();
         bool SupportsFaceBiometric();
         Task<bool> SupportsFaceBiometricAsync();
-        Task<bool> BiometricAvailableAsync();
-        bool UseNativeBiometric();
-        Task<bool> AuthenticateBiometricAsync(string text = null);
         bool SupportsNfc();
         bool SupportsCamera();
         bool SupportsAutofillService();
         int SystemMajorVersion();
         string SystemModel();
         Task<string> DisplayAlertAsync(string title, string message, string cancel, params string[] buttons);
+        Task<string> DisplayActionSheetAsync(string title, string cancel, string destruction, params string[] buttons);
         void Autofill(CipherView cipher);
         void CloseAutofill();
         void Background();

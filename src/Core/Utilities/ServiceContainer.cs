@@ -11,9 +11,10 @@ namespace Bit.Core.Utilities
         public static Dictionary<string, object> RegisteredServices { get; set; } = new Dictionary<string, object>();
         public static bool Inited { get; set; }
 
-        public static void Init(string customUserAgent = null)
+        public static void Init(string customUserAgent = null, string clearCipherCacheKey = null, 
+            string[] allClearCipherCacheKeys = null)
         {
-            if(Inited)
+            if (Inited)
             {
                 return;
             }
@@ -40,25 +41,32 @@ namespace Bit.Core.Utilities
             var userService = new UserService(storageService, tokenService);
             var settingsService = new SettingsService(userService, storageService);
             var cipherService = new CipherService(cryptoService, userService, settingsService, apiService,
-                storageService, i18nService, () => searchService);
+                storageService, i18nService, () => searchService, clearCipherCacheKey, allClearCipherCacheKeys);
             var folderService = new FolderService(cryptoService, userService, apiService, storageService,
                 i18nService, cipherService);
             var collectionService = new CollectionService(cryptoService, userService, storageService, i18nService);
             searchService = new SearchService(cipherService);
-            var lockService = new LockService(cryptoService, userService, platformUtilsService, storageService,
-                folderService, cipherService, collectionService, searchService, messagingService, null);
+            var vaultTimeoutService = new VaultTimeoutService(cryptoService, userService, platformUtilsService, 
+                storageService, folderService, cipherService, collectionService, searchService, messagingService, tokenService,
+                null, (expired) =>
+                {
+                    messagingService.Send("logout", expired);
+                    return Task.FromResult(0);
+                });
+            var policyService = new PolicyService(storageService, userService);
             var syncService = new SyncService(userService, apiService, settingsService, folderService,
-                cipherService, cryptoService, collectionService, storageService, messagingService, (bool expired) =>
+                cipherService, cryptoService, collectionService, storageService, messagingService, policyService,
+                (bool expired) =>
                 {
                     messagingService.Send("logout", expired);
                     return Task.FromResult(0);
                 });
             var passwordGenerationService = new PasswordGenerationService(cryptoService, storageService,
-                cryptoFunctionService);
+                cryptoFunctionService, policyService);
             var totpService = new TotpService(storageService, cryptoFunctionService);
             var authService = new AuthService(cryptoService, apiService, userService, tokenService, appIdService,
-                i18nService, platformUtilsService, messagingService, lockService);
-            // TODO: export service
+                i18nService, platformUtilsService, messagingService, vaultTimeoutService);
+            var exportService = new ExportService(folderService, cipherService);
             var auditService = new AuditService(cryptoFunctionService, apiService);
             var environmentService = new EnvironmentService(apiService, storageService);
             var eventService = new EventService(storageService, apiService, userService, cipherService);
@@ -75,11 +83,13 @@ namespace Bit.Core.Utilities
             Register<IFolderService>("folderService", folderService);
             Register<ICollectionService>("collectionService", collectionService);
             Register<ISearchService>("searchService", searchService);
+            Register<IPolicyService>("policyService", policyService);
             Register<ISyncService>("syncService", syncService);
-            Register<ILockService>("lockService", lockService);
+            Register<IVaultTimeoutService>("vaultTimeoutService", vaultTimeoutService);
             Register<IPasswordGenerationService>("passwordGenerationService", passwordGenerationService);
             Register<ITotpService>("totpService", totpService);
             Register<IAuthService>("authService", authService);
+            Register<IExportService>("exportService", exportService);
             Register<IAuditService>("auditService", auditService);
             Register<IEnvironmentService>("environmentService", environmentService);
             Register<IEventService>("eventService", eventService);
@@ -87,7 +97,7 @@ namespace Bit.Core.Utilities
 
         public static void Register<T>(string serviceName, T obj)
         {
-            if(RegisteredServices.ContainsKey(serviceName))
+            if (RegisteredServices.ContainsKey(serviceName))
             {
                 throw new Exception($"Service {serviceName} has already been registered.");
             }
@@ -96,11 +106,11 @@ namespace Bit.Core.Utilities
 
         public static T Resolve<T>(string serviceName, bool dontThrow = false)
         {
-            if(RegisteredServices.ContainsKey(serviceName))
+            if (RegisteredServices.ContainsKey(serviceName))
             {
                 return (T)RegisteredServices[serviceName];
             }
-            if(dontThrow)
+            if (dontThrow)
             {
                 return (T)(object)null;
             }
@@ -109,6 +119,13 @@ namespace Bit.Core.Utilities
 
         public static void Reset()
         {
+            foreach (var service in RegisteredServices)
+            {
+                if (service.Value != null && service.Value is IDisposable disposableService)
+                {
+                    disposableService.Dispose();
+                }
+            }
             Inited = false;
             RegisteredServices.Clear();
             RegisteredServices = new Dictionary<string, object>();

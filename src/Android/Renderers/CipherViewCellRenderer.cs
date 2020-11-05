@@ -7,6 +7,7 @@ using Android.Views;
 using Android.Views.InputMethods;
 using Android.Widget;
 using Bit.App.Controls;
+using Bit.App.Utilities;
 using Bit.Droid.Renderers;
 using FFImageLoading;
 using FFImageLoading.Views;
@@ -26,40 +27,40 @@ namespace Bit.Droid.Renderers
         private static Android.Graphics.Color _textColor;
         private static Android.Graphics.Color _mutedColor;
         private static Android.Graphics.Color _disabledIconColor;
+        private static bool _usingLightTheme;
 
         private AndroidCipherCell _cell;
 
         protected override Android.Views.View GetCellCore(Cell item, Android.Views.View convertView,
             ViewGroup parent, Context context)
         {
-            if(_faTypeface == null)
+            // TODO expand beyond light/dark detection once we support custom theme switching without app restart
+            var themeChanged = _usingLightTheme != ThemeManager.UsingLightTheme;
+            if (_faTypeface == null)
             {
                 _faTypeface = Typeface.CreateFromAsset(context.Assets, "FontAwesome.ttf");
             }
-            if(_miTypeface == null)
+            if (_miTypeface == null)
             {
                 _miTypeface = Typeface.CreateFromAsset(context.Assets, "MaterialIcons_Regular.ttf");
             }
-            if(_textColor == default(Android.Graphics.Color))
+            if (_textColor == default(Android.Graphics.Color) || themeChanged)
             {
-                _textColor = ((Xamarin.Forms.Color)Xamarin.Forms.Application.Current.Resources["TextColor"])
-                    .ToAndroid();
+                _textColor = ThemeManager.GetResourceColor("TextColor").ToAndroid();
             }
-            if(_mutedColor == default(Android.Graphics.Color))
+            if (_mutedColor == default(Android.Graphics.Color) || themeChanged)
             {
-                _mutedColor = ((Xamarin.Forms.Color)Xamarin.Forms.Application.Current.Resources["MutedColor"])
-                    .ToAndroid();
+                _mutedColor = ThemeManager.GetResourceColor("MutedColor").ToAndroid();
             }
-            if(_disabledIconColor == default(Android.Graphics.Color))
+            if (_disabledIconColor == default(Android.Graphics.Color) || themeChanged)
             {
-                _disabledIconColor =
-                    ((Xamarin.Forms.Color)Xamarin.Forms.Application.Current.Resources["DisabledIconColor"])
-                    .ToAndroid();
+                _disabledIconColor = ThemeManager.GetResourceColor("DisabledIconColor").ToAndroid();
             }
+            _usingLightTheme = ThemeManager.UsingLightTheme;
 
             var cipherCell = item as CipherViewCell;
             _cell = convertView as AndroidCipherCell;
-            if(_cell == null)
+            if (_cell == null)
             {
                 _cell = new AndroidCipherCell(context, cipherCell, _faTypeface, _miTypeface);
             }
@@ -77,11 +78,11 @@ namespace Bit.Droid.Renderers
         {
             var cipherCell = sender as CipherViewCell;
             _cell.CipherViewCell = cipherCell;
-            if(e.PropertyName == CipherViewCell.CipherProperty.PropertyName)
+            if (e.PropertyName == CipherViewCell.CipherProperty.PropertyName)
             {
                 _cell.UpdateCell(cipherCell);
             }
-            else if(e.PropertyName == CipherViewCell.WebsiteIconsEnabledProperty.PropertyName)
+            else if (e.PropertyName == CipherViewCell.WebsiteIconsEnabledProperty.PropertyName)
             {
                 _cell.UpdateIconImage(cipherCell);
             }
@@ -145,7 +146,7 @@ namespace Bit.Droid.Renderers
 
             var cipher = cipherCell.Cipher;
             Name.Text = cipher.Name;
-            if(!string.IsNullOrWhiteSpace(cipher.SubTitle))
+            if (!string.IsNullOrWhiteSpace(cipher.SubTitle))
             {
                 SubTitle.Text = cipher.SubTitle;
                 SubTitle.Visibility = ViewStates.Visible;
@@ -160,7 +161,7 @@ namespace Bit.Droid.Renderers
 
         public void UpdateIconImage(CipherViewCell cipherCell)
         {
-            if(_currentTask != null && !_currentTask.IsCancelled && !_currentTask.IsCompleted)
+            if (_currentTask != null && !_currentTask.IsCancelled && !_currentTask.IsCompleted)
             {
                 _currentTask.Cancel();
             }
@@ -168,7 +169,7 @@ namespace Bit.Droid.Renderers
             var cipher = cipherCell.Cipher;
 
             var iconImage = cipherCell.GetIconImage(cipher);
-            if(iconImage.Item2 != null)
+            if (iconImage.Item2 != null)
             {
                 IconImage.SetImageResource(Resource.Drawable.login);
                 IconImage.Visibility = ViewStates.Visible;
@@ -197,7 +198,7 @@ namespace Bit.Droid.Renderers
 
         private void MoreButton_Click(object sender, EventArgs e)
         {
-            if(CipherViewCell.ButtonCommand?.CanExecute(CipherViewCell.Cipher) ?? false)
+            if (CipherViewCell.ButtonCommand?.CanExecute(CipherViewCell.Cipher) ?? false)
             {
                 CipherViewCell.ButtonCommand.Execute(CipherViewCell.Cipher);
             }
@@ -205,7 +206,7 @@ namespace Bit.Droid.Renderers
 
         protected override void Dispose(bool disposing)
         {
-            if(disposing)
+            if (disposing)
             {
                 MoreButton.Click -= MoreButton_Click;
             }

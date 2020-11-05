@@ -9,12 +9,15 @@ namespace Bit.Core.Services
 {
     public class LiteDbStorageService : IStorageService
     {
+        private static LiteDatabase _db;
+        private static readonly object _lock = new object();
+
         private readonly JsonSerializerSettings _jsonSettings = new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
         private readonly string _dbPath;
-        private LiteCollection<JsonItem> _collection;
+        private ILiteCollection<JsonItem> _collection;
         private Task _initTask;
 
         public LiteDbStorageService(string dbPath)
@@ -24,11 +27,11 @@ namespace Bit.Core.Services
 
         public Task InitAsync()
         {
-            if(_collection != null)
+            if (_collection != null)
             {
                 return Task.FromResult(0);
             }
-            if(_initTask != null)
+            if (_initTask != null)
             {
                 return _initTask;
             }
@@ -36,8 +39,14 @@ namespace Bit.Core.Services
             {
                 try
                 {
-                    var db = new LiteDatabase($"Filename={_dbPath};");
-                    _collection = db.GetCollection<JsonItem>("json_items");
+                    lock (_lock)
+                    {
+                        if (_db == null)
+                        {
+                            _db = new LiteDatabase($"Filename={_dbPath};Upgrade=true;");
+                        }
+                    }
+                    _collection = _db.GetCollection<JsonItem>("json_items");
                 }
                 finally
                 {
@@ -51,7 +60,7 @@ namespace Bit.Core.Services
         {
             await InitAsync();
             var item = _collection.Find(i => i.Id == key).FirstOrDefault();
-            if(item == null)
+            if (item == null)
             {
                 return default(T);
             }
@@ -68,7 +77,7 @@ namespace Bit.Core.Services
         public async Task RemoveAsync(string key)
         {
             await InitAsync();
-            _collection.Delete(i => i.Id == key);
+            _collection.DeleteMany(i => i.Id == key);
         }
 
         private class JsonItem

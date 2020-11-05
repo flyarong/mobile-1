@@ -14,7 +14,9 @@ namespace Bit.iOS.Autofill
     {
         public LoginSearchViewController(IntPtr handle)
             : base(handle)
-        { }
+        {
+            DismissModalAction = Cancel;
+        }
 
         public Context Context { get; set; }
         public CredentialProviderViewController CPViewController { get; set; }
@@ -27,7 +29,7 @@ namespace Bit.iOS.Autofill
             CancelBarButton.Title = AppResources.Cancel;
             SearchBar.Placeholder = AppResources.Search;
             SearchBar.BackgroundColor = SearchBar.BarTintColor = ThemeHelpers.ListHeaderBackgroundColor;
-            if(!ThemeHelpers.LightTheme)
+            if (!ThemeHelpers.LightTheme)
             {
                 SearchBar.KeyboardAppearance = UIKeyboardAppearance.Dark;
             }
@@ -47,7 +49,12 @@ namespace Bit.iOS.Autofill
 
         partial void CancelBarButton_Activated(UIBarButtonItem sender)
         {
-            if(FromList)
+            Cancel();
+        }
+
+        private void Cancel()
+        {
+            if (FromList)
             {
                 DismissViewController(true, null);
             }
@@ -64,12 +71,14 @@ namespace Bit.iOS.Autofill
 
         public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
         {
-            if(segue.DestinationViewController is UINavigationController navController)
+            if (segue.DestinationViewController is UINavigationController navController)
             {
-                if(navController.TopViewController is LoginAddViewController addLoginController)
+                if (navController.TopViewController is LoginAddViewController addLoginController)
                 {
                     addLoginController.Context = Context;
                     addLoginController.LoginSearchController = this;
+                    segue.DestinationViewController.PresentationController.Delegate =
+                        new CustomPresentationControllerDelegate(addLoginController.DismissModalAction);
                 }
             }
         }

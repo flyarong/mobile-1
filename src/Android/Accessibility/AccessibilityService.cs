@@ -4,9 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
-using Android.Graphics;
 using Android.OS;
-using Android.Provider;
 using Android.Runtime;
 using Android.Views;
 using Android.Views.Accessibility;
@@ -27,118 +25,126 @@ namespace Bit.Droid.Accessibility
         private const string BitwardenPackage = "com.x8bit.bitwarden";
         private const string BitwardenWebsite = "vault.bitwarden.com";
 
-        private string _lastNotificationUri = null;
+        private IStorageService _storageService;
+        private IBroadcasterService _broadcasterService;
+        private DateTime? _lastSettingsReload = null;
+        private TimeSpan _settingsReloadSpan = TimeSpan.FromMinutes(1);
+        private HashSet<string> _blacklistedUris;
+        private AccessibilityNodeInfo _anchorNode = null;
+        private int _lastAnchorX = 0;
+        private int _lastAnchorY = 0;
+        private bool _isOverlayAboveAnchor = false;
+        private static bool _overlayAnchorObserverRunning = false;
+        private IWindowManager _windowManager = null;
+        private LinearLayout _overlayView = null;
+        private int _overlayViewHeight = 0;
+        private long _lastAutoFillTime = 0;
+        private Java.Lang.Runnable _overlayAnchorObserverRunnable = null;
+        private Handler _handler = new Handler(Looper.MainLooper);
 
         private HashSet<string> _launcherPackageNames = null;
         private DateTime? _lastLauncherSetBuilt = null;
         private TimeSpan _rebuildLauncherSpan = TimeSpan.FromHours(1);
 
-        private IWindowManager _windowManager = null;
-        private LinearLayout _overlayView = null;
-        private int _anchorViewHash = 0;
-        private int _lastAnchorX, _lastAnchorY = 0;
+        public override void OnCreate()
+        {
+            base.OnCreate();
+            LoadServices();
+            var settingsTask = LoadSettingsAsync();
+            _broadcasterService.Subscribe(nameof(AccessibilityService), (message) =>
+            {
+                if (message.Command == "OnAutofillTileClick")
+                {
+                    var runnable = new Java.Lang.Runnable(OnAutofillTileClick);
+                    _handler.PostDelayed(runnable, 250);
+                }
+            });
+            AccessibilityHelpers.IsAccessibilityBroadcastReady = true;
+        }
+
+        public override void OnDestroy()
+        {
+            AccessibilityHelpers.IsAccessibilityBroadcastReady = false;
+            _broadcasterService.Unsubscribe(nameof(AccessibilityService));
+        }
 
         public override void OnAccessibilityEvent(AccessibilityEvent e)
         {
             try
             {
                 var powerManager = GetSystemService(PowerService) as PowerManager;
-                if(Build.VERSION.SdkInt > BuildVersionCodes.KitkatWatch && !powerManager.IsInteractive)
+                if (Build.VERSION.SdkInt > BuildVersionCodes.KitkatWatch && !powerManager.IsInteractive)
                 {
                     return;
                 }
-                else if(Build.VERSION.SdkInt < BuildVersionCodes.Lollipop && !powerManager.IsScreenOn)
-                {
-                    return;
-                }
-
-                if(SkipPackage(e?.PackageName))
-                {
-                    CancelOverlayPrompt();
-                    return;
-                }
-
-                var root = RootInActiveWindow;
-                if(root == null || root.PackageName != e.PackageName)
+                else if (Build.VERSION.SdkInt < BuildVersionCodes.Lollipop && !powerManager.IsScreenOn)
                 {
                     return;
                 }
 
-                // AccessibilityHelpers.PrintTestData(root, e);
+                if (SkipPackage(e?.PackageName))
+                {
+                    if (e?.PackageName != "com.android.systemui")
+                    {
+                        CancelOverlayPrompt();
+                    }
+                    return;
+                }
 
-                switch(e.EventType)
+                // AccessibilityHelpers.PrintTestData(RootInActiveWindow, e);
+
+                LoadServices();
+                var settingsTask = LoadSettingsAsync();
+                AccessibilityNodeInfo root = null;
+
+                switch (e.EventType)
                 {
                     case EventTypes.ViewFocused:
                     case EventTypes.ViewClicked:
-                    case EventTypes.ViewScrolled:
-                        var isKnownBroswer = AccessibilityHelpers.SupportedBrowsers.ContainsKey(root.PackageName);
-                        if(e.EventType == EventTypes.ViewClicked && isKnownBroswer)
-                        {
-                            break;
-                        }
-                        if(e.Source == null || e.PackageName == BitwardenPackage)
+                        if (e.Source == null || e.PackageName == BitwardenPackage)
                         {
                             CancelOverlayPrompt();
                             break;
                         }
-                        if(e.EventType == EventTypes.ViewScrolled)
+
+                        root = RootInActiveWindow;
+                        if (root == null || root.PackageName != e.PackageName)
                         {
-                            AdjustOverlayForScroll(root, e);
                             break;
+                        }
+
+                        if (!(e.Source?.Password ?? false) && !AccessibilityHelpers.IsUsernameEditText(root, e))
+                        {
+                            CancelOverlayPrompt();
+                            break;
+                        }
+                        if (ScanAndAutofill(root, e))
+                        {
+                            CancelOverlayPrompt();
                         }
                         else
                         {
-                            var isUsernameEditText1 = AccessibilityHelpers.IsUsernameEditText(root, e);
-                            var isPasswordEditText1 = e.Source?.Password ?? false;
-                            if(!isUsernameEditText1 && !isPasswordEditText1)
-                            {
-                                CancelOverlayPrompt();
-                                break;
-                            }
-                            if(ScanAndAutofill(root, e))
-                            {
-                                CancelOverlayPrompt();
-                            }
-                            else
-                            {
-                                OverlayPromptToAutofill(root, e);
-                            }
+                            OverlayPromptToAutofill(root, e);
                         }
                         break;
                     case EventTypes.WindowContentChanged:
                     case EventTypes.WindowStateChanged:
-                        var isUsernameEditText2 = AccessibilityHelpers.IsUsernameEditText(root, e);
-                        var isPasswordEditText2 = e.Source?.Password ?? false;
-                        if(e.Source == null || isUsernameEditText2 || isPasswordEditText2)
+                        if (AccessibilityHelpers.LastCredentials == null)
                         {
                             break;
                         }
-                        else if(AccessibilityHelpers.LastCredentials == null)
-                        {
-                            if(string.IsNullOrWhiteSpace(_lastNotificationUri))
-                            {
-                                CancelOverlayPrompt();
-                                break;
-                            }
-                            var uri = AccessibilityHelpers.GetUri(root);
-                            if(uri != null && uri != _lastNotificationUri)
-                            {
-                                CancelOverlayPrompt();
-                            }
-                            else if(uri != null && uri.StartsWith(Constants.AndroidAppProtocol))
-                            {
-                                CancelOverlayPrompt();
-                            }
-                            break;
-                        }
-
-                        if(e.PackageName == BitwardenPackage)
+                        if (e.PackageName == BitwardenPackage)
                         {
                             CancelOverlayPrompt();
                             break;
                         }
 
-                        if(ScanAndAutofill(root, e))
+                        root = RootInActiveWindow;
+                        if (root == null || root.PackageName != e.PackageName)
+                        {
+                            break;
+                        }
+                        if (ScanAndAutofill(root, e))
                         {
                             CancelOverlayPrompt();
                         }
@@ -146,14 +152,11 @@ namespace Bit.Droid.Accessibility
                     default:
                         break;
                 }
-
-                root.Dispose();
-                e.Dispose();
             }
             // Suppress exceptions so that service doesn't crash.
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(">>> Exception: " + ex.StackTrace);
+                System.Diagnostics.Debug.WriteLine(">>> {0}: {1}", ex.GetType(), ex.StackTrace);
             }
         }
 
@@ -165,22 +168,24 @@ namespace Bit.Droid.Accessibility
         public bool ScanAndAutofill(AccessibilityNodeInfo root, AccessibilityEvent e)
         {
             var filled = false;
-            var passwordNodes = AccessibilityHelpers.GetWindowNodes(root, e, n => n.Password, false);
-            if(passwordNodes.Count > 0)
+            var uri = AccessibilityHelpers.GetUri(root);
+            if (uri != null && !uri.Contains(BitwardenWebsite) &&
+                AccessibilityHelpers.NeedToAutofill(AccessibilityHelpers.LastCredentials, uri))
             {
-                var uri = AccessibilityHelpers.GetUri(root);
-                if(uri != null && !uri.Contains(BitwardenWebsite))
+                var allEditTexts = AccessibilityHelpers.GetWindowNodes(root, e, n => AccessibilityHelpers.EditText(n), false);
+                var usernameEditText = AccessibilityHelpers.GetUsernameEditText(uri, allEditTexts);
+                var passwordNodes = AccessibilityHelpers.GetWindowNodes(root, e, n => n.Password, false);
+                if (usernameEditText != null || passwordNodes.Count > 0)
                 {
-                    if(AccessibilityHelpers.NeedToAutofill(AccessibilityHelpers.LastCredentials, uri))
-                    {
-                        AccessibilityHelpers.GetNodesAndFill(root, e, passwordNodes);
-                        filled = true;
-                    }
-
+                    AccessibilityHelpers.FillCredentials(usernameEditText, passwordNodes);
+                    filled = true;
+                    _lastAutoFillTime = Java.Lang.JavaSystem.CurrentTimeMillis();
+                    AccessibilityHelpers.LastCredentials = null;
                 }
-                AccessibilityHelpers.LastCredentials = null;
+                allEditTexts.Dispose();
+                passwordNodes.Dispose();
             }
-            else if(AccessibilityHelpers.LastCredentials != null)
+            if (AccessibilityHelpers.LastCredentials != null)
             {
                 Task.Run(async () =>
                 {
@@ -188,100 +193,213 @@ namespace Bit.Droid.Accessibility
                     AccessibilityHelpers.LastCredentials = null;
                 });
             }
-            passwordNodes.Dispose();
             return filled;
+        }
+        
+        private void OnAutofillTileClick()
+        {
+            CancelOverlayPrompt();
+            
+            var root = RootInActiveWindow;
+            if (root != null && root.PackageName != BitwardenPackage &&
+               root.PackageName != AccessibilityHelpers.SystemUiPackage &&
+               !SkipPackage(root.PackageName))
+            {
+                var uri = AccessibilityHelpers.GetUri(root);
+                if (!string.IsNullOrWhiteSpace(uri))
+                {
+                    var intent = new Intent(this, typeof(AccessibilityActivity));
+                    intent.PutExtra("uri", uri);
+                    intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.SingleTop | ActivityFlags.ClearTop);
+                    StartActivity(intent);
+                    return;
+                }
+            }
+            
+            Toast.MakeText(this, AppResources.AutofillTileUriNotFound, ToastLength.Long).Show();
         }
 
         private void CancelOverlayPrompt()
         {
-            if(_windowManager == null || _overlayView == null)
+            _overlayAnchorObserverRunning = false;
+
+            if (_windowManager != null && _overlayView != null)
             {
-                return;
+                try
+                {
+                    _windowManager.RemoveViewImmediate(_overlayView);
+                    System.Diagnostics.Debug.WriteLine(">>> Accessibility Overlay View Removed");
+                }
+                catch { }
             }
 
-            _windowManager.RemoveViewImmediate(_overlayView);
-            System.Diagnostics.Debug.WriteLine(">>> Accessibility Overlay View Removed");
-
             _overlayView = null;
-            _anchorViewHash = 0;
-            _lastNotificationUri = null;
             _lastAnchorX = 0;
             _lastAnchorY = 0;
+            _isOverlayAboveAnchor = false;
+
+            if (_anchorNode != null)
+            {
+                _anchorNode.Recycle();
+                _anchorNode = null;
+            }
         }
 
         private void OverlayPromptToAutofill(AccessibilityNodeInfo root, AccessibilityEvent e)
         {
-            if(!AccessibilityHelpers.OverlayPermitted())
+            if (Java.Lang.JavaSystem.CurrentTimeMillis() - _lastAutoFillTime < 1000 ||
+                AccessibilityHelpers.IsAutofillServicePromptVisible(Windows))
             {
-                System.Diagnostics.Debug.WriteLine(">>> Overlay Permission not granted");
-                Toast.MakeText(this, AppResources.AccessibilityOverlayPermissionAlert, ToastLength.Long).Show();
                 return;
+            }
+            
+            if (!AccessibilityHelpers.OverlayPermitted())
+            {
+                if (!AccessibilityHelpers.IsAutofillTileAdded)
+                {
+                    // The user has the option of only using the autofill tile and leaving the overlay permission
+                    // disabled, so only show this toast if they're using accessibility without overlay permission and
+                    // have _not_ added the autofill tile
+                    System.Diagnostics.Debug.WriteLine(">>> Overlay Permission not granted");
+                    Toast.MakeText(this, AppResources.AccessibilityOverlayPermissionAlert, ToastLength.Long).Show();   
+                }
+                return;
+            }
+
+            if (_overlayView != null || _anchorNode != null || _overlayAnchorObserverRunning)
+            {
+                CancelOverlayPrompt();
             }
 
             var uri = AccessibilityHelpers.GetUri(root);
-            if(string.IsNullOrWhiteSpace(uri))
+            var fillable = !string.IsNullOrWhiteSpace(uri);
+            if (fillable)
+            {
+                if (_blacklistedUris != null && _blacklistedUris.Any())
+                {
+                    if (Uri.TryCreate(uri, UriKind.Absolute, out var parsedUri) && parsedUri.Scheme.StartsWith("http"))
+                    {
+                        fillable = !_blacklistedUris.Contains(
+                            string.Format("{0}://{1}", parsedUri.Scheme, parsedUri.Host));
+                    }
+                    else
+                    {
+                        fillable = !_blacklistedUris.Contains(uri);
+                    }
+                }
+            }
+            if (!fillable)
             {
                 return;
             }
 
+            var intent = new Intent(this, typeof(AccessibilityActivity));
+            intent.PutExtra("uri", uri);
+            intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.SingleTop | ActivityFlags.ClearTop);
+
+            _overlayView = AccessibilityHelpers.GetOverlayView(this);
+            _overlayView.Measure(View.MeasureSpec.MakeMeasureSpec(0, 0),
+                View.MeasureSpec.MakeMeasureSpec(0, 0));
+            _overlayViewHeight = _overlayView.MeasuredHeight;
+            _overlayView.Click += (sender, eventArgs) =>
+            {
+                CancelOverlayPrompt();
+                StartActivity(intent);
+            };
+
             var layoutParams = AccessibilityHelpers.GetOverlayLayoutParams();
-            var anchorPosition = AccessibilityHelpers.GetOverlayAnchorPosition(root, e.Source);
+            var anchorPosition = AccessibilityHelpers.GetOverlayAnchorPosition(this, e.Source, 
+                _overlayViewHeight, _isOverlayAboveAnchor);
             layoutParams.X = anchorPosition.X;
             layoutParams.Y = anchorPosition.Y;
 
-            if(_windowManager == null)
+            if (_windowManager == null)
             {
                 _windowManager = GetSystemService(WindowService).JavaCast<IWindowManager>();
             }
 
-            if(_overlayView == null)
-            {
-                var intent = new Intent(this, typeof(AccessibilityActivity));
-                intent.PutExtra("uri", uri);
-                intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.SingleTop | ActivityFlags.ClearTop);
-
-                _overlayView = AccessibilityHelpers.GetOverlayView(this);
-                _overlayView.Click += (sender, eventArgs) =>
-                {
-                    CancelOverlayPrompt();
-                    StartActivity(intent);
-                };
-
-                _lastNotificationUri = uri;
-
-                _windowManager.AddView(_overlayView, layoutParams);
-
-                System.Diagnostics.Debug.WriteLine(">>> Accessibility Overlay View Added at X:{0} Y:{1}",
-                    layoutParams.X, layoutParams.Y);
-            }
-            else
-            {
-                _windowManager.UpdateViewLayout(_overlayView, layoutParams);
-
-                System.Diagnostics.Debug.WriteLine(">>> Accessibility Overlay View Updated to X:{0} Y:{1}",
-                    layoutParams.X, layoutParams.Y);
-            }
-
-            _anchorViewHash = e.Source.GetHashCode();
+            _anchorNode = e.Source;
             _lastAnchorX = anchorPosition.X;
             _lastAnchorY = anchorPosition.Y;
+
+            _windowManager.AddView(_overlayView, layoutParams);
+
+            System.Diagnostics.Debug.WriteLine(">>> Accessibility Overlay View Added at X:{0} Y:{1}",
+                layoutParams.X, layoutParams.Y);
+
+            StartOverlayAnchorObserver();
         }
 
-        private void AdjustOverlayForScroll(AccessibilityNodeInfo root, AccessibilityEvent e)
+        private void StartOverlayAnchorObserver()
         {
-            if(_overlayView == null || _anchorViewHash <= 0)
+            if (_overlayAnchorObserverRunning)
             {
                 return;
             }
 
-            var anchorPosition = AccessibilityHelpers.GetOverlayAnchorPosition(_anchorViewHash, root, e);
-            if(anchorPosition == null)
+            _overlayAnchorObserverRunning = true;
+            _overlayAnchorObserverRunnable = new Java.Lang.Runnable(() =>
             {
+                if (_overlayAnchorObserverRunning)
+                {
+                    AdjustOverlayForScroll();
+                    _handler.PostDelayed(_overlayAnchorObserverRunnable, 250);
+                }
+            });
+
+            _handler.PostDelayed(_overlayAnchorObserverRunnable, 250);
+        }
+
+        private void AdjustOverlayForScroll()
+        {
+            if (_overlayView == null || _anchorNode == null || 
+                AccessibilityHelpers.IsAutofillServicePromptVisible(Windows))
+            {
+                CancelOverlayPrompt();
                 return;
             }
 
-            if(anchorPosition.X == _lastAnchorX && anchorPosition.Y == _lastAnchorY)
+            var root = RootInActiveWindow;
+            IEnumerable<AccessibilityWindowInfo> windows = null;
+            if (Build.VERSION.SdkInt > BuildVersionCodes.Kitkat)
             {
+                windows = Windows;
+            }
+
+            var anchorPosition = AccessibilityHelpers.GetOverlayAnchorPosition(this, _anchorNode, root, 
+                windows, _overlayViewHeight, _isOverlayAboveAnchor);
+            if (anchorPosition == null)
+            {
+                CancelOverlayPrompt();
+                return;
+            }
+            else if (anchorPosition.X == -1 && anchorPosition.Y == -1)
+            {
+                if (_overlayView.Visibility != ViewStates.Gone)
+                {
+                    _overlayView.Visibility = ViewStates.Gone;
+                    System.Diagnostics.Debug.WriteLine(">>> Accessibility Overlay View Hidden");
+                }
+                return;
+            }
+            else if (anchorPosition.X == -1)
+            {
+                _isOverlayAboveAnchor = false;
+                System.Diagnostics.Debug.WriteLine(">>> Accessibility Overlay View Below Anchor");
+                return;
+            }
+            else if (anchorPosition.Y == -1)
+            {
+                _isOverlayAboveAnchor = true;
+                System.Diagnostics.Debug.WriteLine(">>> Accessibility Overlay View Above Anchor");
+                return;
+            }
+            else if (anchorPosition.X == _lastAnchorX && anchorPosition.Y == _lastAnchorY)
+            {
+                if (_overlayView.Visibility != ViewStates.Visible)
+                {
+                    _overlayView.Visibility = ViewStates.Visible;
+                }
                 return;
             }
 
@@ -289,10 +407,15 @@ namespace Bit.Droid.Accessibility
             layoutParams.X = anchorPosition.X;
             layoutParams.Y = anchorPosition.Y;
 
-            _windowManager.UpdateViewLayout(_overlayView, layoutParams);
-
             _lastAnchorX = anchorPosition.X;
             _lastAnchorY = anchorPosition.Y;
+
+            _windowManager.UpdateViewLayout(_overlayView, layoutParams);
+
+            if (_overlayView.Visibility != ViewStates.Visible)
+            {
+                _overlayView.Visibility = ViewStates.Visible;
+            }
 
             System.Diagnostics.Debug.WriteLine(">>> Accessibility Overlay View Updated to X:{0} Y:{1}",
                     layoutParams.X, layoutParams.Y);
@@ -300,13 +423,13 @@ namespace Bit.Droid.Accessibility
 
         private bool SkipPackage(string eventPackageName)
         {
-            if(string.IsNullOrWhiteSpace(eventPackageName) ||
+            if (string.IsNullOrWhiteSpace(eventPackageName) ||
                 AccessibilityHelpers.FilteredPackageNames.Contains(eventPackageName) ||
                 eventPackageName.Contains("launcher"))
             {
                 return true;
             }
-            if(_launcherPackageNames == null || _lastLauncherSetBuilt == null ||
+            if (_launcherPackageNames == null || _lastLauncherSetBuilt == null ||
                 (DateTime.Now - _lastLauncherSetBuilt.Value) > _rebuildLauncherSpan)
             {
                 // refresh launcher list every now and then
@@ -317,6 +440,34 @@ namespace Bit.Droid.Accessibility
                 _launcherPackageNames = resolveInfo.Select(ri => ri.ActivityInfo.PackageName).ToHashSet();
             }
             return _launcherPackageNames.Contains(eventPackageName);
+        }
+
+        private void LoadServices()
+        {
+            if (_storageService == null)
+            {
+                _storageService = ServiceContainer.Resolve<IStorageService>("storageService");
+            }
+            if (_broadcasterService == null)
+            {
+                _broadcasterService = ServiceContainer.Resolve<IBroadcasterService>("broadcasterService");
+            }
+        }
+
+        private async Task LoadSettingsAsync()
+        {
+            var now = DateTime.UtcNow;
+            if (_lastSettingsReload == null || (now - _lastSettingsReload.Value) > _settingsReloadSpan)
+            {
+                _lastSettingsReload = now;
+                var uris = await _storageService.GetAsync<List<string>>(Constants.AutofillBlacklistedUrisKey);
+                if (uris != null)
+                {
+                    _blacklistedUris = new HashSet<string>(uris);
+                }
+                var isAutoFillTileAdded = await _storageService.GetAsync<bool?>(Constants.AutofillTileAdded);
+                AccessibilityHelpers.IsAutofillTileAdded = isAutoFillTileAdded.GetValueOrDefault();
+            }
         }
     }
 }

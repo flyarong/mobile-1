@@ -15,6 +15,7 @@ namespace Bit.App.Pages
         private readonly IPlatformUtilsService _platformUtilsService;
 
         private PasswordGenerationOptions _options;
+        private PasswordGeneratorPolicyOptions _enforcedPolicyOptions;
         private string _password;
         private bool _isPassword;
         private bool _uppercase;
@@ -66,7 +67,7 @@ namespace Bit.App.Pages
             get => _length;
             set
             {
-                if(SetProperty(ref _length, value))
+                if (SetProperty(ref _length, value))
                 {
                     _options.Length = value;
                     var task = SliderInputAsync();
@@ -79,7 +80,7 @@ namespace Bit.App.Pages
             get => _uppercase;
             set
             {
-                if(SetProperty(ref _uppercase, value))
+                if (SetProperty(ref _uppercase, value))
                 {
                     _options.Uppercase = value;
                     var task = SaveOptionsAsync();
@@ -92,7 +93,7 @@ namespace Bit.App.Pages
             get => _lowercase;
             set
             {
-                if(SetProperty(ref _lowercase, value))
+                if (SetProperty(ref _lowercase, value))
                 {
                     _options.Lowercase = value;
                     var task = SaveOptionsAsync();
@@ -105,7 +106,7 @@ namespace Bit.App.Pages
             get => _number;
             set
             {
-                if(SetProperty(ref _number, value))
+                if (SetProperty(ref _number, value))
                 {
                     _options.Number = value;
                     var task = SaveOptionsAsync();
@@ -118,7 +119,7 @@ namespace Bit.App.Pages
             get => _special;
             set
             {
-                if(SetProperty(ref _special, value))
+                if (SetProperty(ref _special, value))
                 {
                     _options.Special = value;
                     var task = SaveOptionsAsync();
@@ -131,7 +132,7 @@ namespace Bit.App.Pages
             get => _avoidAmbiguous;
             set
             {
-                if(SetProperty(ref _avoidAmbiguous, value))
+                if (SetProperty(ref _avoidAmbiguous, value))
                 {
                     _options.Ambiguous = !value;
                     var task = SaveOptionsAsync();
@@ -144,7 +145,7 @@ namespace Bit.App.Pages
             get => _minNumber;
             set
             {
-                if(SetProperty(ref _minNumber, value))
+                if (SetProperty(ref _minNumber, value))
                 {
                     _options.MinNumber = value;
                     var task = SaveOptionsAsync();
@@ -157,7 +158,7 @@ namespace Bit.App.Pages
             get => _minSpecial;
             set
             {
-                if(SetProperty(ref _minSpecial, value))
+                if (SetProperty(ref _minSpecial, value))
                 {
                     _options.MinSpecial = value;
                     var task = SaveOptionsAsync();
@@ -170,7 +171,7 @@ namespace Bit.App.Pages
             get => _numWords;
             set
             {
-                if(SetProperty(ref _numWords, value))
+                if (SetProperty(ref _numWords, value))
                 {
                     _options.NumWords = value;
                     var task = SaveOptionsAsync();
@@ -183,12 +184,12 @@ namespace Bit.App.Pages
             get => _wordSeparator;
             set
             {
-                if(value == null)
+                if (value == null)
                 {
                     return;
                 }
                 var val = value.Trim();
-                if(SetProperty(ref _wordSeparator, val))
+                if (SetProperty(ref _wordSeparator, val))
                 {
                     _options.WordSeparator = val;
                     var task = SaveOptionsAsync();
@@ -201,7 +202,7 @@ namespace Bit.App.Pages
             get => _capitalize;
             set
             {
-                if(SetProperty(ref _capitalize, value))
+                if (SetProperty(ref _capitalize, value))
                 {
                     _options.Capitalize = value;
                     var task = SaveOptionsAsync();
@@ -214,20 +215,32 @@ namespace Bit.App.Pages
             get => _includeNumber;
             set
             {
-                if(SetProperty(ref _includeNumber, value))
+                if (SetProperty(ref _includeNumber, value))
                 {
                     _options.Number = value;
                     var task = SaveOptionsAsync();
                 }
             }
         }
+        
+        public PasswordGeneratorPolicyOptions EnforcedPolicyOptions
+        {
+            get => _enforcedPolicyOptions;
+            set => SetProperty(ref _enforcedPolicyOptions, value,
+                additionalPropertyNames: new[]
+                {
+                    nameof(IsPolicyInEffect)
+                });
+        }
+
+        public bool IsPolicyInEffect => _enforcedPolicyOptions.InEffect();
 
         public int TypeSelectedIndex
         {
             get => _typeSelectedIndex;
             set
             {
-                if(SetProperty(ref _typeSelectedIndex, value))
+                if (SetProperty(ref _typeSelectedIndex, value))
                 {
                     IsPassword = value == 0;
                     var task = SaveOptionsAsync();
@@ -237,7 +250,7 @@ namespace Bit.App.Pages
 
         public async Task InitAsync()
         {
-            _options = await _passwordGenerationService.GetOptionsAsync();
+            (_options, EnforcedPolicyOptions) = await _passwordGenerationService.GetOptionsAsync();
             LoadFromOptions();
             await RegenerateAsync();
             _doneIniting = true;
@@ -251,15 +264,15 @@ namespace Bit.App.Pages
 
         public async Task SaveOptionsAsync(bool regenerate = true)
         {
-            if(!_doneIniting)
+            if (!_doneIniting)
             {
                 return;
             }
             SetOptions();
-            _passwordGenerationService.NormalizeOptions(_options);
+            _passwordGenerationService.NormalizeOptions(_options, _enforcedPolicyOptions);
             await _passwordGenerationService.SaveOptionsAsync(_options);
             LoadFromOptions();
-            if(regenerate)
+            if (regenerate)
             {
                 await RegenerateAsync();
             }
@@ -273,8 +286,12 @@ namespace Bit.App.Pages
 
         public async Task SliderInputAsync()
         {
+            if (!_doneIniting)
+            {
+                return;
+            }
             SetOptions();
-            _passwordGenerationService.NormalizeOptions(_options);
+            _passwordGenerationService.NormalizeOptions(_options, _enforcedPolicyOptions);
             Password = await _passwordGenerationService.GeneratePasswordAsync(_options);
         }
 

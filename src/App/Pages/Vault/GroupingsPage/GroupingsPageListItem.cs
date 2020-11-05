@@ -15,26 +15,31 @@ namespace Bit.App.Pages
         public CipherType? Type { get; set; }
         public string ItemCount { get; set; }
         public bool FuzzyAutofill { get; set; }
+        public bool IsTrash { get; set; }
 
         public string Name
         {
             get
             {
-                if(_name != null)
+                if (_name != null)
                 {
                     return _name;
                 }
-                if(Folder != null)
+                if (IsTrash)
+                {
+                    _name = AppResources.Trash;
+                }
+                else if (Folder != null)
                 {
                     _name = Folder.Name;
                 }
-                else if(Collection != null)
+                else if (Collection != null)
                 {
                     _name = Collection.Name;
                 }
-                else if(Type != null)
+                else if (Type != null)
                 {
-                    switch(Type.Value)
+                    switch (Type.Value)
                     {
                         case CipherType.Login:
                             _name = AppResources.TypeLogin;
@@ -60,21 +65,25 @@ namespace Bit.App.Pages
         {
             get
             {
-                if(_icon != null)
+                if (_icon != null)
                 {
                     return _icon;
                 }
-                if(Folder != null)
+                if (IsTrash)
+                {
+                    _icon = "\uf014"; // fa-trash-o
+                }
+                else if (Folder != null)
                 {
                     _icon = Folder.Id == null ? "" : "";
                 }
-                else if(Collection != null)
+                else if (Collection != null)
                 {
                     _icon = "";
                 }
-                else if(Type != null)
+                else if (Type != null)
                 {
-                    switch(Type.Value)
+                    switch (Type.Value)
                     {
                         case CipherType.Login:
                             _icon = "";

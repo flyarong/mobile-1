@@ -7,7 +7,6 @@
     xmlns:u="clr-namespace:Bit.App.Utilities"
     xmlns:controls="clr-namespace:Bit.App.Controls"
     xmlns:effects="clr-namespace:Bit.App.Effects"
-    xmlns:fab="clr-namespace:Refractored.FabControl;assembly=Refractored.FabControl"
     xmlns:views="clr-namespace:Bit.Core.Models.View;assembly=BitwardenCore"
     x:DataType="pages:ViewPageViewModel"
     x:Name="_page"
@@ -32,8 +31,8 @@
                      Clicked="Share_Clicked"
                      Order="Secondary" />
             <ToolbarItem Text="{u:I18n Close}" Clicked="Close_Clicked" Order="Primary" Priority="-1"
-                         x:Name="_closeItem" x:Key="closeItem"  />
-            <ToolbarItem Text="{u:I18n Edit}" Clicked="EditToolbarItem_Clicked" Order="Primary"
+                         x:Name="_closeItem" x:Key="closeItem" />
+            <ToolbarItem Clicked="EditToolbarItem_Clicked" Order="Primary"
                          x:Name="_editItem" x:Key="editItem" />
             <ToolbarItem Icon="more_vert.png" Clicked="More_Clicked" Order="Primary"
                          x:Name="_moreItem" x:Key="moreItem"
@@ -43,6 +42,8 @@
                          x:Name="_attachmentsItem" x:Key="attachmentsItem" />
             <ToolbarItem Text="{u:I18n Delete}" Clicked="Delete_Clicked" Order="Secondary" IsDestructive="True"
                          x:Name="_deleteItem" x:Key="deleteItem" />
+            <ToolbarItem Text="{u:I18n Clone}" Clicked="Clone_Clicked" Order="Secondary"
+                         x:Name="_cloneItem" x:Key="cloneItem" />
 
             <ScrollView x:Key="scrollView" x:Name="_scrollView">
                 <StackLayout Spacing="20" x:Name="_mainLayout">
@@ -83,7 +84,7 @@
                                     Grid.Column="0" />
                                 <controls:FaButton 
                                     StyleClass="box-row-button, box-row-button-platform"
-                                    Text="&#xf0ea;"
+                                    Text="&#xf24d;"
                                     Command="{Binding CopyCommand}"
                                     CommandParameter="LoginUsername"
                                     Grid.Row="0"
@@ -133,7 +134,8 @@
                                     Grid.Column="1"
                                     Grid.RowSpan="2"
                                     AutomationProperties.IsInAccessibleTree="True"
-                                    AutomationProperties.Name="{u:I18n CheckPassword}" />
+                                    AutomationProperties.Name="{u:I18n CheckPassword}"
+                                    IsVisible="{Binding Cipher.ViewPassword}" />
                                 <controls:FaButton 
                                     StyleClass="box-row-button, box-row-button-platform"
                                     Text="{Binding ShowPasswordIcon}"
@@ -142,17 +144,19 @@
                                     Grid.Column="2"
                                     Grid.RowSpan="2"
                                     AutomationProperties.IsInAccessibleTree="True"
-                                    AutomationProperties.Name="{u:I18n ToggleVisibility}" />
+                                    AutomationProperties.Name="{u:I18n ToggleVisibility}"
+                                    IsVisible="{Binding Cipher.ViewPassword}" />
                                 <controls:FaButton 
                                     StyleClass="box-row-button, box-row-button-platform"
-                                    Text="&#xf0ea;"
+                                    Text="&#xf24d;"
                                     Command="{Binding CopyCommand}"
                                     CommandParameter="LoginPassword"
                                     Grid.Row="0"
                                     Grid.Column="3"
                                     Grid.RowSpan="2"
                                     AutomationProperties.IsInAccessibleTree="True"
-                                    AutomationProperties.Name="{u:I18n CopyPassword}" />
+                                    AutomationProperties.Name="{u:I18n CopyPassword}"
+                                    IsVisible="{Binding Cipher.ViewPassword}" />
                             </Grid>
                             <BoxView StyleClass="box-row-separator"
                                      IsVisible="{Binding Cipher.Login.Password, Converter={StaticResource stringHasValue}}" />
@@ -185,10 +189,10 @@
                                     Grid.RowSpan="2"
                                     HorizontalOptions="End"
                                     HorizontalTextAlignment="End"
-                                    VerticalOptions="CenterAndExpand"/>
+                                    VerticalOptions="CenterAndExpand" />
                                 <controls:FaButton 
                                     StyleClass="box-row-button, box-row-button-platform"
-                                    Text="&#xf0ea;"
+                                    Text="&#xf24d;"
                                     Command="{Binding CopyCommand}"
                                     CommandParameter="LoginTotp"
                                     Grid.Row="0"
@@ -210,7 +214,7 @@
                                     StyleClass="box-value" />
                             </StackLayout>
                             <BoxView StyleClass="box-row-separator"
-                                     IsVisible="{Binding Cipher.Card.CardholderName, Converter={StaticResource stringHasValue}}"/>
+                                     IsVisible="{Binding Cipher.Card.CardholderName, Converter={StaticResource stringHasValue}}" />
                             <Grid StyleClass="box-row"
                                   IsVisible="{Binding Cipher.Card.Number, Converter={StaticResource stringHasValue}}">
                                 <Grid.RowDefinitions>
@@ -233,7 +237,7 @@
                                     Grid.Column="0" />
                                 <controls:FaButton 
                                     StyleClass="box-row-button, box-row-button-platform"
-                                    Text="&#xf0ea;"
+                                    Text="&#xf24d;"
                                     Command="{Binding CopyCommand}"
                                     CommandParameter="CardNumber"
                                     Grid.Row="0"
@@ -305,7 +309,7 @@
                                     AutomationProperties.Name="{u:I18n ToggleVisibility}" />
                                 <controls:FaButton 
                                     StyleClass="box-row-button, box-row-button-platform"
-                                    Text="&#xf0ea;"
+                                    Text="&#xf24d;"
                                     Command="{Binding CopyCommand}"
                                     CommandParameter="CardCode"
                                     Grid.Row="0"
@@ -361,7 +365,7 @@
                                     StyleClass="box-value" />
                             </StackLayout>
                             <BoxView StyleClass="box-row-separator"
-                                     IsVisible="{Binding Cipher.Identity.SSN, Converter={StaticResource stringHasValue}}"/>
+                                     IsVisible="{Binding Cipher.Identity.SSN, Converter={StaticResource stringHasValue}}" />
                             <StackLayout StyleClass="box-row"
                                          IsVisible="{Binding Cipher.Identity.PassportNumber, Converter={StaticResource stringHasValue}}">
                                 <Label
@@ -466,7 +470,7 @@
                                                 Grid.Column="0"
                                                 IsVisible="{Binding IsWebsite, Mode=OneWay}" />
                                             <Label
-                                                Text="{Binding HostnameOrUri, Mode=OneWay}"
+                                                Text="{Binding HostOrUri, Mode=OneWay}"
                                                 StyleClass="box-value"
                                                 Grid.Row="1"
                                                 Grid.Column="0" />
@@ -483,7 +487,7 @@
                                                 AutomationProperties.Name="{u:I18n Launch}" />
                                             <controls:FaButton
                                                 StyleClass="box-row-button, box-row-button-platform"
-                                                Text="&#xf0ea;"
+                                                Text="&#xf24d;"
                                                 Command="{Binding BindingContext.CopyUriCommand, Source={x:Reference _page}}"
                                                 CommandParameter="{Binding .}"
                                                 Grid.Row="0"
@@ -569,7 +573,7 @@
                                                 StyleClass="box-row-button, box-row-button-platform"
                                                 Text="{Binding ShowHiddenValueIcon}"
                                                 Command="{Binding ToggleHiddenValueCommand}"
-                                                IsVisible="{Binding IsHiddenType}"
+                                                IsVisible="{Binding ShowViewHidden}"
                                                 Grid.Row="0"
                                                 Grid.Column="1"
                                                 Grid.RowSpan="2"
@@ -577,7 +581,7 @@
                                                 AutomationProperties.Name="{u:I18n ToggleVisibility}" />
                                             <controls:FaButton
                                                 StyleClass="box-row-button, box-row-button-platform"
-                                                Text="&#xf0ea;"
+                                                Text="&#xf24d;"
                                                 Command="{Binding BindingContext.CopyFieldCommand, Source={x:Reference _page}}"
                                                 CommandParameter="{Binding Field}"
                                                 IsVisible="{Binding ShowCopyButton}"
@@ -661,14 +665,20 @@
             AbsoluteLayout.LayoutFlags="All"
             AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
         </ContentView>
-        <fab:FloatingActionButtonView
+        <Button
             x:Name="_fab"
-            ImageName="pencil.png"
+            Image="pencil.png"
+            Clicked="EditButton_Clicked"
+            Style="{StaticResource btn-fab}"
             AbsoluteLayout.LayoutFlags="PositionProportional"
             AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
             AutomationProperties.IsInAccessibleTree="True"
-            AutomationProperties.Name="{u:I18n EditItem}">
-        </fab:FloatingActionButtonView>
+            AutomationProperties.Name="{u:I18n EditItem}"
+            IsVisible="{Binding CanEdit}">
+            <Button.Effects>
+                <effects:FabShadowEffect />
+            </Button.Effects>
+        </Button>
     </AbsoluteLayout>
 
 </pages:BaseContentPage>

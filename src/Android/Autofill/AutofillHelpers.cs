@@ -16,52 +16,91 @@ namespace Bit.Droid.Autofill
     {
         private static int _pendingIntentId = 0;
 
-        // These browser work natively with the autofill framework
+        // These browsers work natively with the Autofill Framework
+        //
+        // Be sure:
+        //   - to keep these entries sorted alphabetically and
+        //
+        //   - ... to keep this list in sync with values in AccessibilityHelpers.SupportedBrowsers [Section A], too.
         public static HashSet<string> TrustedBrowsers = new HashSet<string>
         {
+            "com.duckduckgo.mobile.android",
             "org.mozilla.focus",
             "org.mozilla.klar",
-            "com.duckduckgo.mobile.android",
         };
 
-        // These browsers work using the compatibility shim for the autofill framework
+        // These browsers work using the compatibility shim for the Autofill Framework
+        //
+        // Be sure:
+        //   - to keep these entries sorted alphabetically,
+        //   - to keep this list in sync with values in Resources/xml/autofillservice.xml, and
+        //
+        //   - ... to keep this list in sync with values in AccessibilityHelpers.SupportedBrowsers [Section A], too.
         public static HashSet<string> CompatBrowsers = new HashSet<string>
         {
-            "org.mozilla.firefox",
-            "org.mozilla.firefox_beta",
-            "com.microsoft.emmx",
-            "com.android.chrome",
-            "com.chrome.beta",
+            "com.amazon.cloud9",
             "com.android.browser",
+            "com.android.chrome",
+            "com.android.htmlviewer",
+            "com.avast.android.secure.browser",
+            "com.avg.android.secure.browser",
             "com.brave.browser",
+            "com.brave.browser_beta",
+            "com.brave.browser_default",
+            "com.brave.browser_dev",
+            "com.brave.browser_nightly",
+            "com.chrome.beta",
+            "com.chrome.canary",
+            "com.chrome.dev",
+            "com.ecosia.android",
+            "com.google.android.apps.chrome",
+            "com.google.android.apps.chrome_dev",
+            "com.kiwibrowser.browser",
+            "com.microsoft.emmx",
+            "com.mmbox.browser",
+            "com.mmbox.xbrowser",
+            "com.naver.whale",
             "com.opera.browser",
             "com.opera.browser.beta",
             "com.opera.mini.native",
-            "com.chrome.dev",
-            "com.chrome.canary",
-            "com.google.android.apps.chrome",
-            "com.google.android.apps.chrome_dev",
-            "com.yandex.browser",
+            "com.opera.mini.native.beta",
+            "com.opera.touch",
+            "com.qwant.liberty",
             "com.sec.android.app.sbrowser",
             "com.sec.android.app.sbrowser.beta",
-            "org.codeaurora.swe.browser",
-            "com.amazon.cloud9",
+            "com.stoutner.privacybrowser.free",
+            "com.stoutner.privacybrowser.standard",
+            "com.vivaldi.browser",
+            "com.vivaldi.browser.snapshot",
+            "com.vivaldi.browser.sopranos",
+            "com.yandex.browser",
+            "com.z28j.feel",
+            "idm.internet.download.manager",
+            "idm.internet.download.manager.adm.lite",
+            "idm.internet.download.manager.plus",
+            "io.github.forkmaintainers.iceraven",
+            "mark.via",
             "mark.via.gp",
+            "org.adblockplus.browser",
+            "org.adblockplus.browser.beta",
             "org.bromite.bromite",
+            "org.bromite.chromium",
             "org.chromium.chrome",
-            "com.kiwibrowser.browser",
-            "com.ecosia.android",
-            "com.opera.mini.native.beta",
-            "org.mozilla.fennec_aurora",
-            "org.mozilla.fennec_fdroid",
-            "com.qwant.liberty",
-            "com.opera.touch",
+            "org.codeaurora.swe.browser",
+            "org.gnu.icecat",
             "org.mozilla.fenix",
             "org.mozilla.fenix.nightly",
+            "org.mozilla.fennec_aurora",
+            "org.mozilla.fennec_fdroid",
+            "org.mozilla.firefox",
+            "org.mozilla.firefox_beta",
             "org.mozilla.reference.browser",
             "org.mozilla.rocket",
             "org.torproject.torbrowser",
-            "com.vivaldi.browser",
+            "org.torproject.torbrowser_alpha",
+            "org.ungoogled.chromium",
+            "org.ungoogled.chromium.extensions.stable",
+            "org.ungoogled.chromium.stable",
         };
 
         // The URLs are blacklisted from autofilling
@@ -75,17 +114,17 @@ namespace Bit.Droid.Autofill
 
         public static async Task<List<FilledItem>> GetFillItemsAsync(Parser parser, ICipherService cipherService)
         {
-            if(parser.FieldCollection.FillableForLogin)
+            if (parser.FieldCollection.FillableForLogin)
             {
                 var ciphers = await cipherService.GetAllDecryptedByUrlAsync(parser.Uri);
-                if(ciphers.Item1.Any() || ciphers.Item2.Any())
+                if (ciphers.Item1.Any() || ciphers.Item2.Any())
                 {
                     var allCiphers = ciphers.Item1.ToList();
                     allCiphers.AddRange(ciphers.Item2.ToList());
                     return allCiphers.Select(c => new FilledItem(c)).ToList();
                 }
             }
-            else if(parser.FieldCollection.FillableForCard)
+            else if (parser.FieldCollection.FillableForCard)
             {
                 var ciphers = await cipherService.GetAllDecryptedAsync();
                 return ciphers.Where(c => c.Type == CipherType.Card).Select(c => new FilledItem(c)).ToList();
@@ -96,12 +135,12 @@ namespace Bit.Droid.Autofill
         public static FillResponse BuildFillResponse(Parser parser, List<FilledItem> items, bool locked)
         {
             var responseBuilder = new FillResponse.Builder();
-            if(items != null && items.Count > 0)
+            if (items != null && items.Count > 0)
             {
-                foreach(var item in items)
+                foreach (var item in items)
                 {
                     var dataset = BuildDataset(parser.ApplicationContext, parser.FieldCollection, item);
-                    if(dataset != null)
+                    if (dataset != null)
                     {
                         responseBuilder.AddDataset(dataset);
                     }
@@ -118,7 +157,7 @@ namespace Bit.Droid.Autofill
         {
             var datasetBuilder = new Dataset.Builder(
                 BuildListView(filledItem.Name, filledItem.Subtitle, filledItem.Icon, context));
-            if(filledItem.ApplyToFields(fields, datasetBuilder))
+            if (filledItem.ApplyToFields(fields, datasetBuilder))
             {
                 return datasetBuilder.Build();
             }
@@ -129,15 +168,15 @@ namespace Bit.Droid.Autofill
         {
             var intent = new Intent(context, typeof(MainActivity));
             intent.PutExtra("autofillFramework", true);
-            if(fields.FillableForLogin)
+            if (fields.FillableForLogin)
             {
                 intent.PutExtra("autofillFrameworkFillType", (int)CipherType.Login);
             }
-            else if(fields.FillableForCard)
+            else if (fields.FillableForCard)
             {
                 intent.PutExtra("autofillFrameworkFillType", (int)CipherType.Card);
             }
-            else if(fields.FillableForIdentity)
+            else if (fields.FillableForIdentity)
             {
                 intent.PutExtra("autofillFrameworkFillType", (int)CipherType.Identity);
             }
@@ -159,7 +198,7 @@ namespace Bit.Droid.Autofill
             datasetBuilder.SetAuthentication(pendingIntent.IntentSender);
 
             // Dataset must have a value set. We will reset this in the main activity when the real item is chosen.
-            foreach(var autofillId in fields.AutofillIds)
+            foreach (var autofillId in fields.AutofillIds)
             {
                 datasetBuilder.SetValue(autofillId, AutofillValue.ForText("PLACEHOLDER"));
             }
@@ -181,24 +220,24 @@ namespace Bit.Droid.Autofill
             // Docs state that password fields cannot be reliably saved in Compat mode since they will show as
             // masked values.
             var compatBrowser = CompatBrowsers.Contains(parser.PackageName);
-            if(compatBrowser && fields.SaveType == SaveDataType.Password)
+            if (compatBrowser && fields.SaveType == SaveDataType.Password)
             {
                 return;
             }
 
             var requiredIds = fields.GetRequiredSaveFields();
-            if(fields.SaveType == SaveDataType.Generic || requiredIds.Length == 0)
+            if (fields.SaveType == SaveDataType.Generic || requiredIds.Length == 0)
             {
                 return;
             }
 
             var saveBuilder = new SaveInfo.Builder(fields.SaveType, requiredIds);
             var optionalIds = fields.GetOptionalSaveIds();
-            if(optionalIds.Length > 0)
+            if (optionalIds.Length > 0)
             {
                 saveBuilder.SetOptionalIds(optionalIds);
             }
-            if(compatBrowser)
+            if (compatBrowser)
             {
                 saveBuilder.SetFlags(SaveFlags.SaveOnAllViewsInvisible);
             }

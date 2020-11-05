@@ -186,14 +186,14 @@
     <comment>Short label for an email address.</comment>
   </data>
   <data name="EmailAddress" xml:space="preserve">
-    <value>Email 地址</value>
+    <value>电子邮件地址</value>
     <comment>Full label for a email address.</comment>
   </data>
   <data name="EmailUs" xml:space="preserve">
     <value>给我们发邮件</value>
   </data>
   <data name="EmailUsDescription" xml:space="preserve">
-    <value>请直接给我们发邮件来获得帮助，也可以留下反馈信息。</value>
+    <value>请直接给我们发邮件来获得帮助，或留下反馈信息。</value>
   </data>
   <data name="EnterPIN" xml:space="preserve">
     <value>请输入您的 PIN 码。</value>
@@ -222,7 +222,7 @@
     <value>文件夹已删除。</value>
   </data>
   <data name="FolderNone" xml:space="preserve">
-    <value>没有文件夹</value>
+    <value>默认文件夹</value>
     <comment>Items that have no folder specified go in this special "catch-all" folder.</comment>
   </data>
   <data name="Folders" xml:space="preserve">
@@ -243,11 +243,11 @@
     <comment>Hide a secret value that is currently shown (password).</comment>
   </data>
   <data name="InternetConnectionRequiredMessage" xml:space="preserve">
-    <value>请链接因特网后再继续。</value>
+    <value>请连接因特网后再继续。</value>
     <comment>Description message for the alert when internet connection is required to continue.</comment>
   </data>
   <data name="InternetConnectionRequiredTitle" xml:space="preserve">
-    <value>需要因特网链接</value>
+    <value>需要因特网连接</value>
     <comment>Title for the alert when internet connection is required to continue.</comment>
   </data>
   <data name="InvalidMasterPassword" xml:space="preserve">
@@ -352,7 +352,7 @@
     <comment>Label for a username.</comment>
   </data>
   <data name="ValidationFieldRequired" xml:space="preserve">
-    <value>必须填写 {0} 。</value>
+    <value>必须填写 {0} 字段。</value>
     <comment>Validation message for when a form field is left blank and is required to be entered.</comment>
   </data>
   <data name="ValueHasBeenCopied" xml:space="preserve">
@@ -412,7 +412,7 @@
     <value>Bitwarden App 扩展</value>
   </data>
   <data name="BitwardenAppExtensionAlert2" xml:space="preserve">
-    <value>最简单的添加网站的方法是 Bitwarden App 扩展。请到 “设置” 页面获得更多信息。</value>
+    <value>向您的密码库中添加新登录项目的最简单方法，就是 Bitwarden App 扩展。转到 “设置” 屏幕了解更多有关使用 Bitwarden App 扩展的方法。</value>
   </data>
   <data name="BitwardenAppExtensionDescription" xml:space="preserve">
     <value>在 Safari 和其他应用中使用 Bitwarden 来自动填写登录信息。</value>
@@ -421,7 +421,7 @@
     <value>Bitwarden 自动填写服务</value>
   </data>
   <data name="BitwardenAutofillAccessibilityServiceDescription" xml:space="preserve">
-    <value>使用 Bitwarden 无障碍服务自动填写您的登录信息。</value>
+    <value>使用 bitwarden 无障碍服务自动填写您的登录信息。</value>
   </data>
   <data name="ChangeEmail" xml:space="preserve">
     <value>修改 Email</value>
@@ -504,13 +504,13 @@
     <value>导入项目</value>
   </data>
   <data name="ImportItemsConfirmation" xml:space="preserve">
-    <value>您可以在 bitwarden.com 网页版密码库批量导入登录项目。您现在要访问这个网站吗？</value>
+    <value>您可以在 bitwarden.com 网页版密码库批量导入项目。您现在要访问这个网站吗？</value>
   </data>
   <data name="ImportItemsDescription" xml:space="preserve">
-    <value>快速从其他密码管理应用批量导入您的登录项目。</value>
+    <value>从其他密码管理应用中快速批量导入您的项目。</value>
   </data>
   <data name="LastSync" xml:space="preserve">
-    <value>上次同步:</value>
+    <value>上次同步：</value>
   </data>
   <data name="Length" xml:space="preserve">
     <value>长度</value>
@@ -518,23 +518,29 @@
   <data name="Lock" xml:space="preserve">
     <value>锁定</value>
   </data>
-  <data name="LockOption15Minutes" xml:space="preserve">
+  <data name="FifteenMinutes" xml:space="preserve">
     <value>15 分钟</value>
   </data>
-  <data name="LockOption1Hour" xml:space="preserve">
+  <data name="OneHour" xml:space="preserve">
     <value>1 小时</value>
   </data>
-  <data name="LockOption1Minute" xml:space="preserve">
+  <data name="OneMinute" xml:space="preserve">
     <value>1 分钟</value>
   </data>
-  <data name="LockOption4Hours" xml:space="preserve">
+  <data name="FourHours" xml:space="preserve">
     <value>4 小时</value>
   </data>
-  <data name="LockOptionImmediately" xml:space="preserve">
+  <data name="Immediately" xml:space="preserve">
     <value>立即</value>
   </data>
-  <data name="LockOptions" xml:space="preserve">
-    <value>锁定选项</value>
+  <data name="VaultTimeout" xml:space="preserve">
+    <value>密码库超时</value>
+  </data>
+  <data name="VaultTimeoutAction" xml:space="preserve">
+    <value>密码库超时动作</value>
+  </data>
+  <data name="VaultTimeoutLogOutConfirmation" xml:space="preserve">
+    <value>超时后登出将解除对密码库的所有访问权限，并需要进行在线认证。确定使用此设置吗？</value>
   </data>
   <data name="LoggingIn" xml:space="preserve">
     <value>正在登录...</value>
@@ -550,23 +556,23 @@
     <value>两次填写的密码不一致。</value>
   </data>
   <data name="MasterPasswordDescription" xml:space="preserve">
-    <value>主密码是访问密码库的密码。非常重要，请不要忘记。忘记主密码以后没有途径可以恢复或重置。</value>
+    <value>主密码是您访问密码库的唯一密码。它非常重要，请您不要忘记。一旦忘记，无任何办法恢复此密码。</value>
   </data>
   <data name="MasterPasswordHint" xml:space="preserve">
     <value>主密码提示 (可选)</value>
   </data>
   <data name="MasterPasswordHintDescription" xml:space="preserve">
-    <value>主密码提示可以在你忘记密码时帮你回忆。</value>
+    <value>主密码提示可以在你忘记密码时帮你回忆起来。</value>
   </data>
   <data name="MasterPasswordLengthValMessage" xml:space="preserve">
     <value>主密码至少需要 8 个字符。</value>
   </data>
   <data name="MinNumbers" xml:space="preserve">
-    <value>数字</value>
+    <value>数字最少个数</value>
     <comment>Minimum numeric characters for password generator settings</comment>
   </data>
   <data name="MinSpecial" xml:space="preserve">
-    <value>符号</value>
+    <value>符号最少个数</value>
     <comment>Minimum special characters for password generator settings</comment>
   </data>
   <data name="MoreSettings" xml:space="preserve">
@@ -582,16 +588,16 @@
     <value>已新建项目。</value>
   </data>
   <data name="NoFavorites" xml:space="preserve">
-    <value>你没有收藏任何网站。</value>
+    <value>你的密码库中没有任何收藏。</value>
   </data>
   <data name="NoItems" xml:space="preserve">
-    <value>您的密码库里没有登录项目。</value>
+    <value>您的密码库里没有任何项目。</value>
   </data>
   <data name="NoItemsTap" xml:space="preserve">
-    <value>您的密码库里没有此网站的登录项目。请添加一个。</value>
+    <value>您的密码库里没有此网站/应用的登录项目。请添加一个。</value>
   </data>
   <data name="NoUsernamePasswordConfigured" xml:space="preserve">
-    <value>此网站没有配置过用户名或者密码。</value>
+    <value>此登录没有配置用户名或者密码。</value>
   </data>
   <data name="OkGotIt" xml:space="preserve">
     <value>好，开搞！</value>
@@ -683,13 +689,13 @@
     <value>两步登录</value>
   </data>
   <data name="TwoStepLoginConfirmation" xml:space="preserve">
-    <value>两步登录需要您登录时输入一个从认证应用获得的安全码，这样能使您的账户更安全。两步登录可以在 bitwarden.com 网页版打开。您现在要访问这个网站吗？</value>
+    <value>两步登录要求您从其他设备（例如安全钥匙、验证器应用、短信、电话或者电子邮件）来验证你的登录，这能使您的账户更加安全。两步登录可以在 bitwarden.com 网页版密码库启用。您现在要访问这个网站吗？</value>
   </data>
   <data name="UnlockWith" xml:space="preserve">
     <value>用 {0} 解锁</value>
   </data>
   <data name="UnlockWithPIN" xml:space="preserve">
-    <value>用PIN 码解锁</value>
+    <value>用 PIN 码解锁</value>
   </data>
   <data name="Validating" xml:space="preserve">
     <value>正在验证</value>
@@ -705,49 +711,49 @@
     <value>Bitwarden 网页版密码库</value>
   </data>
   <data name="Lost2FAApp" xml:space="preserve">
-    <value>认证应用已丢失？</value>
+    <value>丢失了验证器应用？</value>
   </data>
   <data name="Items" xml:space="preserve">
     <value>项目</value>
     <comment>Screen title</comment>
   </data>
   <data name="ExtensionActivated" xml:space="preserve">
-    <value>扩展激活 ！</value>
+    <value>扩展已激活 ！</value>
   </data>
   <data name="Icons" xml:space="preserve">
     <value>图标</value>
   </data>
   <data name="Translations" xml:space="preserve">
-    <value>译者</value>
+    <value>翻译</value>
   </data>
   <data name="ItemsForUri" xml:space="preserve">
     <value>{0} 的项目</value>
     <comment>This is used for the autofill service. ex. "Logins for twitter.com"</comment>
   </data>
   <data name="NoItemsForUri" xml:space="preserve">
-    <value>您的密码库里没有 {0} 的登录项目。</value>
+    <value>您的密码库里没有 {0} 的项目。</value>
     <comment>This is used for the autofill service. ex. "There are no items in your vault for twitter.com".</comment>
   </data>
-  <data name="BitwardenAutofillServiceNotification" xml:space="preserve">
-    <value>当你看到一个 Bitwarden 自动填写通知时，您可以用它来启动自动填写服务。</value>
+  <data name="BitwardenAutofillServiceOverlay" xml:space="preserve">
+    <value>当您选择一个输入字段并看到一个 Bitwarden 自动填写悬浮窗时，您可以点击它来启动自动填写服务。</value>
   </data>
   <data name="BitwardenAutofillServiceNotificationContent" xml:space="preserve">
-    <value>点击此通知，以便从您的密码库自动登录。</value>
+    <value>点击此通知以自动填写密码库中的项目。</value>
   </data>
   <data name="BitwardenAutofillServiceOpenAccessibilitySettings" xml:space="preserve">
     <value>打开无障碍设置</value>
   </data>
   <data name="BitwardenAutofillServiceStep1" xml:space="preserve">
-    <value>1. 在 Android 的辅助功能设置屏幕上，触摸服务项下的 "Bitwarden" 的标题。</value>
+    <value>1. 在 Android 的辅助功能设置屏幕上，点击服务标题下的 "Bitwarden" 。</value>
   </data>
   <data name="BitwardenAutofillServiceStep2" xml:space="preserve">
-    <value>2. 切换开关，然后按确定接受。</value>
+    <value>2. 切换开关，然后按确定以接受。</value>
   </data>
   <data name="Disabled" xml:space="preserve">
-    <value>禁用</value>
+    <value>已禁用</value>
   </data>
   <data name="Enabled" xml:space="preserve">
-    <value>启用</value>
+    <value>已启用</value>
   </data>
   <data name="Status" xml:space="preserve">
     <value>状态</value>
@@ -759,10 +765,10 @@
     <value>自动填写</value>
   </data>
   <data name="AutofillOrView" xml:space="preserve">
-    <value>您要自动填写还是查看此登录项目？</value>
+    <value>您要自动填写还是查看此项目？</value>
   </data>
   <data name="BitwardenAutofillServiceMatchConfirm" xml:space="preserve">
-    <value>确定要自动登录？并不完全匹配 "{0}" 。</value>
+    <value>您确定要自动填写吗？并不完全匹配 "{0}" 。</value>
   </data>
   <data name="MatchingItems" xml:space="preserve">
     <value>匹配项目</value>
@@ -774,35 +780,17 @@
     <value>搜索</value>
   </data>
   <data name="BitwardenAutofillServiceSearch" xml:space="preserve">
-    <value>你正在为 "{0}" 寻找一个自动登录。</value>
+    <value>你正在为 "{0}" 寻找一个自动填写项目。</value>
   </data>
   <data name="ShareVault" xml:space="preserve">
-    <value>分享你的密码库</value>
-  </data>
-  <data name="AutofillPasswordField" xml:space="preserve">
-    <value>当焦点在密码字段时扫描</value>
-  </data>
-  <data name="AutofillPasswordFieldDescription" xml:space="preserve">
-    <value>当你选择一个密码字段时，只扫描屏幕字段并提供自动填充通知。此设置可帮助延长电池寿命。 </value>
-  </data>
-  <data name="AutofillPersistNotification" xml:space="preserve">
-    <value>始终通知</value>
-  </data>
-  <data name="AutofillPersistNotificationDescription" xml:space="preserve">
-    <value>始终提供自动填写通知，并且只在尝试自动填写后扫描字段。此设置可帮助延长电池寿命。</value>
-  </data>
-  <data name="AutofillAlways" xml:space="preserve">
-    <value>始终扫描</value>
-  </data>
-  <data name="AutofillAlwaysDescription" xml:space="preserve">
-    <value>始终扫描屏幕上的字段，如果找到密码字段，将只提供自动填充通知。这是默认设置。</value>
+    <value>共享你的密码库</value>
   </data>
   <data name="CannotOpenApp" xml:space="preserve">
     <value>无法打开应用 "{0}"。</value>
     <comment>Message shown when trying to launch an app that does not exist on the user's device.</comment>
   </data>
   <data name="AuthenticatorAppTitle" xml:space="preserve">
-    <value>身份验证 App</value>
+    <value>身份验证器 App</value>
     <comment>For 2FA</comment>
   </data>
   <data name="EnterVerificationCodeApp" xml:space="preserve">
@@ -818,10 +806,10 @@
     <comment>For 2FA whenever there are no available providers on this device.</comment>
   </data>
   <data name="NoTwoStepAvailable" xml:space="preserve">
-    <value>此帐户已启用的两步登录，但是，此设备不支持配置两步登录。请使用支持的设备，或者添加附加支持跨设备的提供程序（如验证器 App）。</value>
+    <value>此账户已启用两步登录，但此设备不支持任何已配置的两步登录提供程序。请使用支持的设备，和/或添加能更好支持跨设备使用的提供程序（比如验证器应用）。</value>
   </data>
   <data name="RecoveryCodeTitle" xml:space="preserve">
-    <value>恢复码</value>
+    <value>恢复代码</value>
     <comment>For 2FA</comment>
   </data>
   <data name="RememberMe" xml:space="preserve">
@@ -836,7 +824,7 @@
     <value>两步登录选项</value>
   </data>
   <data name="UseAnotherTwoStepMethod" xml:space="preserve">
-    <value>使用另一种两步登录方法</value>
+    <value>使用其他两步登录方法</value>
   </data>
   <data name="VerificationEmailNotSent" xml:space="preserve">
     <value>无法发送验证电子邮件。请再试一次。</value>
@@ -847,10 +835,10 @@
     <comment>For 2FA</comment>
   </data>
   <data name="YubiKeyInstruction" xml:space="preserve">
-    <value>将您的 YubiKey NEO 靠在设备的后面，或者将 YubiKey 插入您设备的 USB 端口，按下按钮后继续。</value>
+    <value>接着，将您的 YubiKey NEO 靠在设备的后面或者将 YubiKey 插入您设备的 USB 端口，然后按下按钮。</value>
   </data>
   <data name="YubiKeyTitle" xml:space="preserve">
-    <value>YubiKey 安全密钥</value>
+    <value>YubiKey 安全钥匙</value>
     <comment>"YubiKey" is the product name and should not be translated.</comment>
   </data>
   <data name="AddNewAttachment" xml:space="preserve">
@@ -870,7 +858,7 @@
     <comment>Message shown when downloading a file</comment>
   </data>
   <data name="AttachmentLargeWarning" xml:space="preserve">
-    <value>此附件大小是 {0} 。您确定要下载到设备？</value>
+    <value>此附件大小是 {0} 。您确定要下载到设备吗？</value>
     <comment>The placeholder will show the file size of the attachment. Ex "25 MB"</comment>
   </data>
   <data name="AuthenticatorKey" xml:space="preserve">
@@ -893,7 +881,7 @@
     <value>将相机对准 QR 码。</value>
   </data>
   <data name="ScanQrTitle" xml:space="preserve">
-    <value>扫描二维码</value>
+    <value>扫描 QR 码</value>
   </data>
   <data name="Camera" xml:space="preserve">
     <value>相机</value>
@@ -905,10 +893,10 @@
     <value>复制 TOTP</value>
   </data>
   <data name="DisableAutoTotpCopyDescription" xml:space="preserve">
-    <value>如果您的登录信息包含一个验证密钥，当自动填写该登录项目时，TOTP 验证码将会自动复制到剪贴板。</value>
+    <value>如果您的登录信息包含一个验证器密钥，当自动填写该登录项目时，TOTP 验证码将会自动复制到剪贴板。</value>
   </data>
   <data name="DisableAutoTotpCopy" xml:space="preserve">
-    <value>禁用自动 TOTP 备份</value>
+    <value>禁用自动 TOTP 复制</value>
   </data>
   <data name="PremiumRequired" xml:space="preserve">
     <value>使用此功能需要高级会员资格。</value>
@@ -944,7 +932,7 @@
     <value>在您更新加密密钥前，您不能使用此功能。</value>
   </data>
   <data name="LearnMore" xml:space="preserve">
-    <value>了解更多信息。</value>
+    <value>了解更多信息</value>
   </data>
   <data name="ApiUrl" xml:space="preserve">
     <value>API 服务器 URL</value>
@@ -970,16 +958,16 @@
     <value>自托管环境</value>
   </data>
   <data name="SelfHostedEnvironmentFooter" xml:space="preserve">
-    <value>指定自己配置、托管的 Bitwarden 环境的基础 URL。</value>
+    <value>指定您本地托管的 Bitwarden 安装的基础 URL。</value>
   </data>
   <data name="ServerUrl" xml:space="preserve">
     <value>服务器 URL</value>
   </data>
   <data name="WebVaultUrl" xml:space="preserve">
-    <value>Web 存储库服务器 URL</value>
+    <value>网页密码库服务器 URL</value>
   </data>
   <data name="BitwardenAutofillServiceNotificationContentOld" xml:space="preserve">
-    <value>点击此通知，以便从您的密码库查看登录项目。</value>
+    <value>点击此通知以查看密码库中的项目。</value>
   </data>
   <data name="CustomFields" xml:space="preserve">
     <value>自定义字段</value>
@@ -991,7 +979,7 @@
     <value>复制安全码</value>
   </data>
   <data name="Number" xml:space="preserve">
-    <value>数字</value>
+    <value>号码</value>
   </data>
   <data name="SecurityCode" xml:space="preserve">
     <value>安全码</value>
@@ -1144,32 +1132,35 @@
     <value>集合</value>
   </data>
   <data name="NoItemsCollection" xml:space="preserve">
-    <value>此集合中没有登录项目。</value>
+    <value>此集合中没有项目。</value>
   </data>
   <data name="NoItemsFolder" xml:space="preserve">
-    <value>此文件夹中没有登录项目。</value>
+    <value>此文件夹中没有项目。</value>
+  </data>
+  <data name="NoItemsTrash" xml:space="preserve">
+    <value>回收站中没有项目。</value>
   </data>
   <data name="AutofillAccessibilityService" xml:space="preserve">
-    <value>自动填充服务</value>
+    <value>自动填写无障碍服务</value>
   </data>
   <data name="AutofillServiceDescription" xml:space="preserve">
-    <value>Bitwarden 自动填写服务使用 Android 自动填写框架来帮助您将登录、身份等信息填写到在的设备上的其他应用程序。</value>
+    <value>Bitwarden 自动填写服务使用 Android 自动填写框架来帮助您将登录、信用卡和身份信息填写到你设备上的其他应用程序中。</value>
   </data>
   <data name="BitwardenAutofillServiceDescription" xml:space="preserve">
-    <value>使用 Bitwarden 自动填写服务在应用和网站自动填写您的登录项目。</value>
+    <value>使用 Bitwarden 自动填写服务将登录、信用卡和身份信息填写到其他应用程序中。</value>
   </data>
   <data name="BitwardenAutofillServiceOpenAutofillSettings" xml:space="preserve">
-    <value>打开自动填充设置</value>
+    <value>打开自动填写设置</value>
   </data>
   <data name="FaceID" xml:space="preserve">
     <value>面容 ID</value>
     <comment>What Apple calls their facial recognition reader.</comment>
   </data>
   <data name="FaceIDDirection" xml:space="preserve">
-    <value>使用 "面容 ID" 进行验证。</value>
+    <value>使用面容 ID 验证。</value>
   </data>
   <data name="UseFaceIDToUnlock" xml:space="preserve">
-    <value>使用 "面容 ID" 解锁</value>
+    <value>使用面容 ID 解锁</value>
   </data>
   <data name="VerifyFaceID" xml:space="preserve">
     <value>验证面容 ID</value>
@@ -1239,7 +1230,7 @@
     <value>是的，保存</value>
   </data>
   <data name="AutofillAndSave" xml:space="preserve">
-    <value>自动填充并保存</value>
+    <value>自动填写并保存</value>
   </data>
   <data name="Organization" xml:space="preserve">
     <value>组织</value>
@@ -1252,10 +1243,10 @@
     <value>再试一次</value>
   </data>
   <data name="YubiKeyInstructionIos" xml:space="preserve">
-    <value>要继续, 请将您的 YubiKey NEO 设备放在设备背面。</value>
+    <value>要继续，请将您的 YubiKey NEO 设备放在设备背面。</value>
   </data>
   <data name="BitwardenAutofillAccessibilityServiceDescription2" xml:space="preserve">
-    <value>当应用程序不支持标准的自动填充服务时, 辅助功能服务可能会很有用。</value>
+    <value>当应用程序不支持标准的自动填写服务时，无障碍服务可能会很有用。</value>
   </data>
   <data name="DatePasswordUpdated" xml:space="preserve">
     <value>密码更新于</value>
@@ -1266,43 +1257,43 @@
     <comment>ex. Date this item was updated</comment>
   </data>
   <data name="AutofillActivated" xml:space="preserve">
-    <value>自动填充已激活！</value>
+    <value>自动填写已激活！</value>
   </data>
   <data name="MustLogInMainAppAutofill" xml:space="preserve">
-    <value>您必须先登录 Bitwarden 应用，才可以使用自动填充。</value>
+    <value>您必须先登录 Bitwarden 应用，才可以使用自动填写。</value>
   </data>
   <data name="AutofillSetup" xml:space="preserve">
     <value>现在您可以更轻松、快捷地登录应用和网站了！</value>
   </data>
   <data name="AutofillSetup2" xml:space="preserve">
-    <value>建议您在“设置”里关闭其它您不再使用的自动填充应用程序。</value>
+    <value>建议您在“设置”里关闭其它您不再使用的自动填写应用程序。</value>
   </data>
   <data name="BitwardenAutofillDescription" xml:space="preserve">
-    <value>自动填充允许您直接从密码库选取需要登录的账户。</value>
+    <value>从键盘直接访问密码库以快速自动填写密码。</value>
   </data>
   <data name="AutofillTurnOn" xml:space="preserve">
-    <value>请按照以下步骤开启 Bitwarden 自动填充功能：</value>
+    <value>请按照以下步骤在你的设备上开启密码自动填写功能：</value>
   </data>
   <data name="AutofillTurnOn1" xml:space="preserve">
     <value>1. 前往 iOS 的 “设置” 应用</value>
   </data>
   <data name="AutofillTurnOn2" xml:space="preserve">
-    <value>2. 进入 “密码与帐户”</value>
+    <value>2. 点击 “密码与帐户”</value>
   </data>
   <data name="AutofillTurnOn3" xml:space="preserve">
-    <value>3. 点击 “自动填充密码”</value>
+    <value>3. 点击 “自动填写密码”</value>
   </data>
   <data name="AutofillTurnOn4" xml:space="preserve">
-    <value>4. 打开开关</value>
+    <value>4. 打开 “自动填写” 开关</value>
   </data>
   <data name="AutofillTurnOn5" xml:space="preserve">
-    <value>5. 选择 Bitwarden 用来自动填充密码</value>
+    <value>5. 勾选 “Bitwarden”</value>
   </data>
   <data name="PasswordAutofill" xml:space="preserve">
-    <value>自动填充密码</value>
+    <value>自动填写密码</value>
   </data>
   <data name="BitwardenAutofillAlert2" xml:space="preserve">
-    <value>向您的密码库中添加新登录项目的最简单方法，就是 Bitwarden 自动填写扩展。转到 “设置” 屏幕了解更多有关使用 Bitwarden 自动填写扩展的方法。</value>
+    <value>向您的密码库中添加新登录项目的最简单方法，就是使用 Bitwarden 密码自动填写扩展。转到 “设置” 屏幕了解更多有关使用 Bitwarden 密码自动填写扩展的方法。</value>
   </data>
   <data name="InvalidEmail" xml:space="preserve">
     <value>无效的电子邮件地址。</value>
@@ -1323,7 +1314,7 @@
     <value>所有项目</value>
   </data>
   <data name="URIs" xml:space="preserve">
-    <value>地址</value>
+    <value>URIs</value>
     <comment>Plural form of a URI</comment>
   </data>
   <data name="CheckingPassword" xml:space="preserve">
@@ -1331,13 +1322,13 @@
     <comment>A loading message when doing an exposed password check.</comment>
   </data>
   <data name="CheckPassword" xml:space="preserve">
-    <value>检查密码是否已经泄露。</value>
+    <value>检查密码是否已经被公开。</value>
   </data>
   <data name="PasswordExposed" xml:space="preserve">
-    <value>此密码已泄漏 {0} 次。建议立即更改。</value>
+    <value>此密码在泄露数据中已被公开 {0} 次。请立即修改。</value>
   </data>
   <data name="PasswordSafe" xml:space="preserve">
-    <value>在已知的数据泄露中没有发现此密码，它暂时比较安全。</value>
+    <value>没有在已知的数据泄露中发现此密码，它暂时比较安全。</value>
   </data>
   <data name="IdentityName" xml:space="preserve">
     <value>身份名称</value>
@@ -1355,10 +1346,10 @@
     <value>没有可列出的密码。</value>
   </data>
   <data name="NoItemsToList" xml:space="preserve">
-    <value>没有要显示的项目。</value>
+    <value>没有可列出的项目。</value>
   </data>
   <data name="SearchCollection" xml:space="preserve">
-    <value>搜索收藏</value>
+    <value>搜索集合</value>
   </data>
   <data name="SearchFolder" xml:space="preserve">
     <value>搜索文件夹</value>
@@ -1385,31 +1376,31 @@
     <value>谁拥有这个项目？</value>
   </data>
   <data name="NoCollectionsToList" xml:space="preserve">
-    <value>目前没有可以显示的收藏。</value>
+    <value>没有可列出的集合。</value>
   </data>
   <data name="ItemShared" xml:space="preserve">
     <value>项目已共享。</value>
   </data>
   <data name="SelectOneCollection" xml:space="preserve">
-    <value>您必须选择至少一个收藏。</value>
+    <value>您必须至少选择一个集合。</value>
   </data>
   <data name="Share" xml:space="preserve">
-    <value>分享</value>
+    <value>共享</value>
   </data>
   <data name="ShareItem" xml:space="preserve">
-    <value>分享项目</value>
+    <value>共享项目</value>
   </data>
   <data name="NoOrgsToList" xml:space="preserve">
     <value>没有可列出的组织。</value>
   </data>
   <data name="ShareDesc" xml:space="preserve">
-    <value>选择您希望与之共享此项目的组织。共享操作将会把项目的所有权转移到该组织。一旦共享，您将不再是此项目的直接所有者。</value>
+    <value>选择您希望与之共享此项目的组织。共享操作将会把此项目的所有权转移到该组织。一旦共享，您将不再是此项目的直接所有者。</value>
   </data>
   <data name="NumberOfWords" xml:space="preserve">
-    <value>字数</value>
+    <value>单词数</value>
   </data>
   <data name="Passphrase" xml:space="preserve">
-    <value>密码</value>
+    <value>密码短语</value>
   </data>
   <data name="WordSeparator" xml:space="preserve">
     <value>单词分隔符</value>
@@ -1434,7 +1425,7 @@
     <comment>A 'fingerprint phrase' is a unique word phrase (similar to a passphrase) that a user can use to authenticate their public key with another user, for the purposes of sharing.</comment>
   </data>
   <data name="ShareVaultConfirmation" xml:space="preserve">
-    <value>Bitwarden 允许您使用组织帐户与他人共享您的存储库。您想访问 bitwarden.com 网站以了解更多内容吗？</value>
+    <value>Bitwarden 允许您使用组织帐户与他人共享您的密码库。您想访问 bitwarden.com 网站以了解更多内容吗？</value>
   </data>
   <data name="ExportVault" xml:space="preserve">
     <value>导出密码库</value>
@@ -1448,11 +1439,8 @@
   <data name="Unlock" xml:space="preserve">
     <value>解锁​​​​</value>
   </data>
-  <data name="LockOption30Minutes" xml:space="preserve">
+  <data name="ThirtyMinutes" xml:space="preserve">
     <value>30 分钟</value>
-  </data>
-  <data name="LockOption5Minutes" xml:space="preserve">
-    <value>5 分钟</value>
   </data>
   <data name="SetPINDescription" xml:space="preserve">
     <value>设定您用来解锁 Bitwarden 的 PIN 码。您的 PIN 设置将在您完全退出本应用程序时被重置。</value>
@@ -1462,10 +1450,10 @@
     <comment>ex: Logged in as user@example.com on bitwarden.com.</comment>
   </data>
   <data name="VaultLockedMasterPassword" xml:space="preserve">
-    <value>您的密码库被锁定，请先验证您的主密码。</value>
+    <value>您的密码库已锁定，请验证您的主密码以继续。</value>
   </data>
   <data name="VaultLockedPIN" xml:space="preserve">
-    <value>您的密码库已锁定。请输入您的 PIN 码以继续。</value>
+    <value>您的密码库已锁定。请验证您的 PIN 码以继续。</value>
   </data>
   <data name="Dark" xml:space="preserve">
     <value>暗</value>
@@ -1477,9 +1465,6 @@
   </data>
   <data name="FiveMinutes" xml:space="preserve">
     <value>5 分钟</value>
-  </data>
-  <data name="OneMinute" xml:space="preserve">
-    <value>1 分钟</value>
   </data>
   <data name="TenSeconds" xml:space="preserve">
     <value>10 秒</value>
@@ -1506,7 +1491,7 @@
     <comment>Default URI match detection for auto-fill.</comment>
   </data>
   <data name="DefaultUriMatchDetectionDescription" xml:space="preserve">
-    <value>选择 URI 匹配检测在操作，例如自动填充时处理的默认方式。</value>
+    <value>选择在执行诸如自动填写之类的操作时对登录进行 URI 匹配检测的默认方式。</value>
   </data>
   <data name="Theme" xml:space="preserve">
     <value>主题</value>
@@ -1529,10 +1514,10 @@
     <value>退出</value>
   </data>
   <data name="ExitConfirmation" xml:space="preserve">
-    <value>您确定要退出 Bitwarden？</value>
+    <value>您确定要退出 Bitwarden 吗？</value>
   </data>
   <data name="PINRequireMasterPasswordRestart" xml:space="preserve">
-    <value>You you want to require unlocking with your master password when the application is restarted?</value>
+    <value>应用程序重启时，要求使用主密码解锁吗？</value>
   </data>
   <data name="Black" xml:space="preserve">
     <value>黑色</value>
@@ -1542,22 +1527,22 @@
     <value>黑名单 URI</value>
   </data>
   <data name="BlacklistedUrisDescription" xml:space="preserve">
-    <value>列入黑名单的URI将不提供自动填充。列表应以逗号分隔。例如："https://twitter.com, androidapp://com.twitter.android"。</value>
+    <value>列入黑名单的 URI 将不提供自动填写。列表应以逗号分隔。例如："https://twitter.com, androidapp://com.twitter.android"。</value>
   </data>
   <data name="DisableSavePrompt" xml:space="preserve">
     <value>禁用保存提示</value>
   </data>
   <data name="DisableSavePromptDescription" xml:space="preserve">
-    <value>当您第一次登录时，“保存登录提醒” 会自动提醒您在密码库里保存新的登录项目。</value>
+    <value>当您第一次输入新的项目时，“保存提示” 会自动提醒您在密码库里保存此新项目。</value>
   </data>
-  <data name="LockOptionOnRestart" xml:space="preserve">
-    <value>重启时</value>
+  <data name="OnRestart" xml:space="preserve">
+    <value>应用重启时</value>
   </data>
   <data name="AutofillServiceNotEnabled" xml:space="preserve">
-    <value>自动填充，可以安全地从其他网站和应用程序中访问您的 Bitwarden 安全库。看起来您还没有启用 Bitwarden 自动填充服务。从“设置”屏幕启用 Bitwarden 自动填充。</value>
+    <value>自动填写可以简单安全地从其他网站和应用程序中访问您的 Bitwarden 密码库。看起来您还没有启用 Bitwarden 自动填写服务。从“设置”屏幕启用 Bitwarden 自动填写。</value>
   </data>
   <data name="ThemeAppliedOnRestart" xml:space="preserve">
-    <value>您的主题将在应用重启时启用。</value>
+    <value>您的主题将在应用程序重启后生效。</value>
   </data>
   <data name="Capitalize" xml:space="preserve">
     <value>大写</value>
@@ -1570,7 +1555,7 @@
     <value>下载</value>
   </data>
   <data name="Shared" xml:space="preserve">
-    <value>分享</value>
+    <value>已共享</value>
   </data>
   <data name="ToggleVisibility" xml:space="preserve">
     <value>切换可见性</value>
@@ -1582,9 +1567,168 @@
     <value>使用生物识别技术验证。</value>
   </data>
   <data name="Biometrics" xml:space="preserve">
-    <value>生物识别技术</value>
+    <value>生物识别</value>
   </data>
   <data name="UseBiometricsToUnlock" xml:space="preserve">
-    <value>使用生物识别技术解锁</value>
+    <value>使用生物识别解锁</value>
+  </data>
+  <data name="AccessibilityOverlayPermissionAlert" xml:space="preserve">
+    <value>Bitwarden 需要相关权限 - 请在 Bitwarden 设置中查看“自动填写无障碍服务”</value>
+  </data>
+  <data name="BitwardenAutofillServiceOverlayPermission" xml:space="preserve">
+    <value>3. 在 Android 应用设置界面找到 Bitwarden，点击“高级”展开高级菜单后点击“显示在其他应用的上层”选项，然后点击“允许显示在其它应用的上层”来启用。</value>
+  </data>
+  <data name="OverlayPermission" xml:space="preserve">
+    <value>权限</value>
+  </data>
+  <data name="BitwardenAutofillServiceOpenOverlayPermissionSettings" xml:space="preserve">
+    <value>打开“显示在其它应用的上层”权限设置</value>
+  </data>
+  <data name="BitwardenAutofillServiceStep3" xml:space="preserve">
+    <value>3. 在 Android 应用设置界面找到 Bitwarden，点击“高级”展开高级菜单后点击“显示在其他应用的上层”选项，然后点击“允许显示在其它应用的上层”来启用。</value>
+  </data>
+  <data name="Denied" xml:space="preserve">
+    <value>拒绝</value>
+  </data>
+  <data name="Granted" xml:space="preserve">
+    <value>已授权</value>
+  </data>
+  <data name="FileFormat" xml:space="preserve">
+    <value>文件格式</value>
+  </data>
+  <data name="ExportVaultMasterPasswordDescription" xml:space="preserve">
+    <value>输入主密码来导出你的密码库。</value>
+  </data>
+  <data name="ExportVaultWarning" xml:space="preserve">
+    <value>导出的密码库数据包含未加密格式。您不应该通过不安全的渠道（例如电子邮件）来存储或发送导出的文件。用完后请立即将其删除。</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="ExportVaultFailure" xml:space="preserve">
+    <value>导出您的密码库时出现问题。如果问题仍然存在，您需要从网页密版码库中导出。</value>
+  </data>
+  <data name="ExportVaultSuccess" xml:space="preserve">
+    <value>密码库导出成功</value>
+  </data>
+  <data name="Clone" xml:space="preserve">
+    <value>克隆</value>
+    <comment>Clone an entity (verb).</comment>
+  </data>
+  <data name="PasswordGeneratorPolicyInEffect" xml:space="preserve">
+    <value>一个或多个组织策略正在影响您的生成器设置</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>打开</value>
+    <comment>Button text for an open operation (verb).</comment>
+  </data>
+  <data name="UnableToSaveAttachment" xml:space="preserve">
+    <value>保存此附件时出现问题。如果问题仍然存在，您可以从网页版密码库中保存它。</value>
+  </data>
+  <data name="SaveAttachmentSuccess" xml:space="preserve">
+    <value>附件保存成功</value>
+  </data>
+  <data name="AutofillTileAccessibilityRequired" xml:space="preserve">
+    <value>请从 Bitwarden 设置中启用“自动填写无障碍服务”以使用自动填写功能。</value>
+  </data>
+  <data name="AutofillTileUriNotFound" xml:space="preserve">
+    <value>未检测到密码字段</value>
+  </data>
+  <data name="SoftDeleting" xml:space="preserve">
+    <value>正在发送到回收站...</value>
+    <comment>Message shown when interacting with the server</comment>
+  </data>
+  <data name="ItemSoftDeleted" xml:space="preserve">
+    <value>项目已发送到回收站。</value>
+    <comment>Confirmation message after successfully soft-deleting a login</comment>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>恢复</value>
+    <comment>Restores an entity (verb).</comment>
+  </data>
+  <data name="Restoring" xml:space="preserve">
+    <value>正在恢复...</value>
+    <comment>Message shown when interacting with the server</comment>
+  </data>
+  <data name="ItemRestored" xml:space="preserve">
+    <value>项目已恢复。</value>
+    <comment>Confirmation message after successfully restoring a soft-deleted item</comment>
+  </data>
+  <data name="Trash" xml:space="preserve">
+    <value>回收站</value>
+    <comment>(noun) Location of deleted items which have not yet been permanently deleted</comment>
+  </data>
+  <data name="SearchTrash" xml:space="preserve">
+    <value>搜索回收站</value>
+    <comment>(action prompt) Label for the search text field when viewing the trash folder</comment>
+  </data>
+  <data name="DoYouReallyWantToPermanentlyDeleteCipher" xml:space="preserve">
+    <value>您确定要永久删除吗？此操作无法撤销。</value>
+    <comment>Confirmation alert message when permanently deleteing a cipher.</comment>
+  </data>
+  <data name="DoYouReallyWantToRestoreCipher" xml:space="preserve">
+    <value>您确定要恢复此项目吗？</value>
+    <comment>Confirmation alert message when restoring a soft-deleted cipher.</comment>
+  </data>
+  <data name="DoYouReallyWantToSoftDeleteCipher" xml:space="preserve">
+    <value>您确定要发送到回收站吗？</value>
+    <comment>Confirmation alert message when soft-deleting a cipher.</comment>
+  </data>
+  <data name="BiometricInvalidated" xml:space="preserve">
+    <value>检测到生物特征变化，使用主密码登录以重新启用。</value>
+  </data>
+  <data name="EnableSyncOnRefresh" xml:space="preserve">
+    <value>启用刷新时同步</value>
+  </data>
+  <data name="EnableSyncOnRefreshDescription" xml:space="preserve">
+    <value>正在使用下拉手势同步密码库。</value>
+  </data>
+  <data name="LogInSso" xml:space="preserve">
+    <value>企业单点登录（SSO）</value>
+  </data>
+  <data name="LogInSsoSummary" xml:space="preserve">
+    <value>要使用您组织的单点登录（SSO）门户快速登录。请首先输入您组织的标识符。</value>
+  </data>
+  <data name="OrgIdentifier" xml:space="preserve">
+    <value>组织标识符</value>
+  </data>
+  <data name="LoginSsoError" xml:space="preserve">
+    <value>当前无法使用 SSO 登陆</value>
+  </data>
+  <data name="SetMasterPassword" xml:space="preserve">
+    <value>设置主密码</value>
+  </data>
+  <data name="SetMasterPasswordSummary" xml:space="preserve">
+    <value>为使用单点登录（SSO）功能，请设置一个主密码以访问和保护您的密码库。</value>
+  </data>
+  <data name="MasterPasswordPolicyInEffect" xml:space="preserve">
+    <value>一个或多个组织策略要求您的主密码满足下列要求：</value>
+  </data>
+  <data name="PolicyInEffectMinComplexity" xml:space="preserve">
+    <value>最小复杂度为 {0}</value>
+  </data>
+  <data name="PolicyInEffectMinLength" xml:space="preserve">
+    <value>最小长度为 {0}</value>
+  </data>
+  <data name="PolicyInEffectUppercase" xml:space="preserve">
+    <value>至少包含一个大写字符</value>
+  </data>
+  <data name="PolicyInEffectLowercase" xml:space="preserve">
+    <value>至少包含一个小写字符</value>
+  </data>
+  <data name="PolicyInEffectNumbers" xml:space="preserve">
+    <value>至少包含一个数字</value>
+  </data>
+  <data name="PolicyInEffectSpecial" xml:space="preserve">
+    <value>包含至少一个下列的特殊字符： {0}</value>
+  </data>
+  <data name="MasterPasswordPolicyValidationTitle" xml:space="preserve">
+    <value>无效密码</value>
+  </data>
+  <data name="MasterPasswordPolicyValidationMessage" xml:space="preserve">
+    <value>密码不符合组织要求。请检查策略信息并重试。</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>载入中</value>
   </data>
 </root>

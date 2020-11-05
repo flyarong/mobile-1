@@ -518,23 +518,29 @@
   <data name="Lock" xml:space="preserve">
     <value>Blocca</value>
   </data>
-  <data name="LockOption15Minutes" xml:space="preserve">
+  <data name="FifteenMinutes" xml:space="preserve">
     <value>15 minuti</value>
   </data>
-  <data name="LockOption1Hour" xml:space="preserve">
+  <data name="OneHour" xml:space="preserve">
     <value>1 ora</value>
   </data>
-  <data name="LockOption1Minute" xml:space="preserve">
+  <data name="OneMinute" xml:space="preserve">
     <value>1 minuto</value>
   </data>
-  <data name="LockOption4Hours" xml:space="preserve">
+  <data name="FourHours" xml:space="preserve">
     <value>4 ore</value>
   </data>
-  <data name="LockOptionImmediately" xml:space="preserve">
+  <data name="Immediately" xml:space="preserve">
     <value>Immediatamente</value>
   </data>
-  <data name="LockOptions" xml:space="preserve">
-    <value>Opzioni di blocco</value>
+  <data name="VaultTimeout" xml:space="preserve">
+    <value>Scadenza Cassaforte</value>
+  </data>
+  <data name="VaultTimeoutAction" xml:space="preserve">
+    <value>Azione Scadenza Cassaforte</value>
+  </data>
+  <data name="VaultTimeoutLogOutConfirmation" xml:space="preserve">
+    <value>La disconnessione rimuove tutti gli accessi alla tua cassaforte e richiede l'autenticazione online dopo il periodo di scadenza. Sei sicuro di voler utilizzare questa impostazione?</value>
   </data>
   <data name="LoggingIn" xml:space="preserve">
     <value>Connessione in corso...</value>
@@ -728,8 +734,8 @@
     <value>Non ci sono elementi nella tua cassaforte per {0}.</value>
     <comment>This is used for the autofill service. ex. "There are no items in your vault for twitter.com".</comment>
   </data>
-  <data name="BitwardenAutofillServiceNotification" xml:space="preserve">
-    <value>Quando vedi una notifica di completamento automatico Bitwarden, puoi toccarla per avviare il servizio di completamento automatico.</value>
+  <data name="BitwardenAutofillServiceOverlay" xml:space="preserve">
+    <value>Quando selezioni un campo di input e vedi un overlay di autocompletamento di Bitwarden, puoi toccarlo per lanciare il servizio di completamento automatico.</value>
   </data>
   <data name="BitwardenAutofillServiceNotificationContent" xml:space="preserve">
     <value>Tocca questa notifica per auto-completare un login dal tuo vault.</value>
@@ -778,24 +784,6 @@
   </data>
   <data name="ShareVault" xml:space="preserve">
     <value>Condividi La Tua Cassaforte</value>
-  </data>
-  <data name="AutofillPasswordField" xml:space="preserve">
-    <value>Rileva quando un campo password è selezionato</value>
-  </data>
-  <data name="AutofillPasswordFieldDescription" xml:space="preserve">
-    <value>Rileva solamente i campi da riempire e offri una notifica per il riempimento. Questa opzione potrebbe risparmiare batteria.</value>
-  </data>
-  <data name="AutofillPersistNotification" xml:space="preserve">
-    <value>Notifiche persistenti</value>
-  </data>
-  <data name="AutofillPersistNotificationDescription" xml:space="preserve">
-    <value>Offri sempre una notifica di auto-completamento e rileva campi solo dopo un completamento. Questa opzione potrebbe risparmiare batteria.</value>
-  </data>
-  <data name="AutofillAlways" xml:space="preserve">
-    <value>Rileva Sempre</value>
-  </data>
-  <data name="AutofillAlwaysDescription" xml:space="preserve">
-    <value>Rileva sempre campi e offri notifica di auto-riempimento solo se vengono trovati campi di password. Questa è l'opzione di default.</value>
   </data>
   <data name="CannotOpenApp" xml:space="preserve">
     <value>Impossibile aprire l'app "{0}".</value>
@@ -1149,6 +1137,9 @@
   <data name="NoItemsFolder" xml:space="preserve">
     <value>Non ci sono elementi in questa cartella.</value>
   </data>
+  <data name="NoItemsTrash" xml:space="preserve">
+    <value>Non ci sono elementi nel cestino.</value>
+  </data>
   <data name="AutofillAccessibilityService" xml:space="preserve">
     <value>Servizio di accessibilità dell'auto riempimento</value>
   </data>
@@ -1358,7 +1349,7 @@
     <value>Non ci sono elementi da mostrare.</value>
   </data>
   <data name="SearchCollection" xml:space="preserve">
-    <value>Cerca collezione</value>
+    <value>Cerca nella raccolta</value>
   </data>
   <data name="SearchFolder" xml:space="preserve">
     <value>Cerca cartella</value>
@@ -1448,11 +1439,8 @@
   <data name="Unlock" xml:space="preserve">
     <value>Sblocca</value>
   </data>
-  <data name="LockOption30Minutes" xml:space="preserve">
+  <data name="ThirtyMinutes" xml:space="preserve">
     <value>30 minuti</value>
-  </data>
-  <data name="LockOption5Minutes" xml:space="preserve">
-    <value>5 minuti</value>
   </data>
   <data name="SetPINDescription" xml:space="preserve">
     <value>Imposta il tuo codice PIN per sbloccare Bitwarden. Le impostazioni PIN verranno reimpostate se si effettuerà il logout completo dall'applicazione.</value>
@@ -1477,9 +1465,6 @@
   </data>
   <data name="FiveMinutes" xml:space="preserve">
     <value>5 minuti</value>
-  </data>
-  <data name="OneMinute" xml:space="preserve">
-    <value>1 minuto</value>
   </data>
   <data name="TenSeconds" xml:space="preserve">
     <value>10 secondi</value>
@@ -1542,7 +1527,7 @@
     <value>URI nella lista nera</value>
   </data>
   <data name="BlacklistedUrisDescription" xml:space="preserve">
-    <value>URIs that are blacklisted will not offer auto-fill. The list of apps should be comma separated. Ex: "https://twitter.com, androidapp://com.twitter.android".</value>
+    <value>Gli URI nella lista nera non forniranno auto-completamento. La lista di apps deve essrere separata da virgole. Ad es: "https://twitter.com, androidapp://com.twitter.android".</value>
   </data>
   <data name="DisableSavePrompt" xml:space="preserve">
     <value>Disabilita Richiesta di Salvataggio</value>
@@ -1550,8 +1535,8 @@
   <data name="DisableSavePromptDescription" xml:space="preserve">
     <value>La "Richiesta di salvataggio" ti richiede automaticamente di salvare nuovi elementi nella tua cassaforte quando le utilizzi per la prima volta.</value>
   </data>
-  <data name="LockOptionOnRestart" xml:space="preserve">
-    <value>Al riavvio dell'applicazione</value>
+  <data name="OnRestart" xml:space="preserve">
+    <value>Al Riavvio dell'App</value>
   </data>
   <data name="AutofillServiceNotEnabled" xml:space="preserve">
     <value>Auto-riempimento rende facile accedere in modo sicuro alla tua cassaforte Bitwarden da altri siti web e applicazioni. Sembra che tu non abbia abilitato un servizio di auto-riempimento per Bitwarden. Abilita l'auto-riempimento per Bitwarden dalla schermata "Impostazioni".</value>
@@ -1586,5 +1571,164 @@
   </data>
   <data name="UseBiometricsToUnlock" xml:space="preserve">
     <value>Usa Dati Biometrici Per Sbloccare</value>
+  </data>
+  <data name="AccessibilityOverlayPermissionAlert" xml:space="preserve">
+    <value>Bitwarden richiede la tua attenzione - Vedi "Servizio di Accessibilità dell'Auto Completameno" dalle Impostazioni di Bitwarden</value>
+  </data>
+  <data name="BitwardenAutofillServiceOverlayPermission" xml:space="preserve">
+    <value>3. Sulla schermata di Impostazioni dell'App Android per Bitwarden, vai alle opzioni "Mostra sulle altre app" (sotto Avanzate) e tocca l'interruttore per abilitare il supporto overlay.</value>
+  </data>
+  <data name="OverlayPermission" xml:space="preserve">
+    <value>Permessi</value>
+  </data>
+  <data name="BitwardenAutofillServiceOpenOverlayPermissionSettings" xml:space="preserve">
+    <value>Apri Impostazioni D'Accessibilità</value>
+  </data>
+  <data name="BitwardenAutofillServiceStep3" xml:space="preserve">
+    <value>3. Sulla schermata delle Impostazioni App per Bitwarden, seleziona "Visualizzazione in primo piano" (sotto "Avanzate") e attiva l'opzione per consentire la sovrapposizione.</value>
+  </data>
+  <data name="Denied" xml:space="preserve">
+    <value>Negato</value>
+  </data>
+  <data name="Granted" xml:space="preserve">
+    <value>Concesso</value>
+  </data>
+  <data name="FileFormat" xml:space="preserve">
+    <value>Formato del File</value>
+  </data>
+  <data name="ExportVaultMasterPasswordDescription" xml:space="preserve">
+    <value>Inserisci la tua password principale per esportare i dati della tua cassaforte.</value>
+  </data>
+  <data name="ExportVaultWarning" xml:space="preserve">
+    <value>Questa esportazione contiene i dati della tua cassaforte in formato non crittografato. Non dovresti archiviare o inviare i file esportati attraverso canali non sicuri (come l'email). Eliminali immediatamente dopo che hai finito di usarli.</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Avviso</value>
+  </data>
+  <data name="ExportVaultFailure" xml:space="preserve">
+    <value>Si è verificato un problema esportando la tua cassaforte. Se il problema persiste, dovrai esportare dalla cassaforte web.</value>
+  </data>
+  <data name="ExportVaultSuccess" xml:space="preserve">
+    <value>Cassaforte esportata con successo</value>
+  </data>
+  <data name="Clone" xml:space="preserve">
+    <value>Clona</value>
+    <comment>Clone an entity (verb).</comment>
+  </data>
+  <data name="PasswordGeneratorPolicyInEffect" xml:space="preserve">
+    <value>Una o più politiche dell'organizzazione stanno influenzando le impostazioni del tuo generatore</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Apri</value>
+    <comment>Button text for an open operation (verb).</comment>
+  </data>
+  <data name="UnableToSaveAttachment" xml:space="preserve">
+    <value>Si è verificato un problema salvando questo allegato. Se il problema persiste, puoi salvarlo dalla cassaforte web.</value>
+  </data>
+  <data name="SaveAttachmentSuccess" xml:space="preserve">
+    <value>Allegato salvato con successo</value>
+  </data>
+  <data name="AutofillTileAccessibilityRequired" xml:space="preserve">
+    <value>Si prega di abilitare il "Servizio di accessibilità per il completamento automatico" dalle impostazioni di Bitwarden per utilizzare la funzione di completamento automatico.</value>
+  </data>
+  <data name="AutofillTileUriNotFound" xml:space="preserve">
+    <value>Nessun campo password rilevato</value>
+  </data>
+  <data name="SoftDeleting" xml:space="preserve">
+    <value>Spostamento nel cestino in corso...</value>
+    <comment>Message shown when interacting with the server</comment>
+  </data>
+  <data name="ItemSoftDeleted" xml:space="preserve">
+    <value>L'elemento è stato spostato nel cestino.</value>
+    <comment>Confirmation message after successfully soft-deleting a login</comment>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Ripristina</value>
+    <comment>Restores an entity (verb).</comment>
+  </data>
+  <data name="Restoring" xml:space="preserve">
+    <value>Ripristino in corso...</value>
+    <comment>Message shown when interacting with the server</comment>
+  </data>
+  <data name="ItemRestored" xml:space="preserve">
+    <value>L'elemento è stato ripristinato.</value>
+    <comment>Confirmation message after successfully restoring a soft-deleted item</comment>
+  </data>
+  <data name="Trash" xml:space="preserve">
+    <value>Cestino</value>
+    <comment>(noun) Location of deleted items which have not yet been permanently deleted</comment>
+  </data>
+  <data name="SearchTrash" xml:space="preserve">
+    <value>Cerca nel cestino</value>
+    <comment>(action prompt) Label for the search text field when viewing the trash folder</comment>
+  </data>
+  <data name="DoYouReallyWantToPermanentlyDeleteCipher" xml:space="preserve">
+    <value>Sei sicuro di voler eliminare definitivamente l'elemento? L'operazione non può essere annullata.</value>
+    <comment>Confirmation alert message when permanently deleteing a cipher.</comment>
+  </data>
+  <data name="DoYouReallyWantToRestoreCipher" xml:space="preserve">
+    <value>Sei sicuro di voler ripristinare l'elemento?</value>
+    <comment>Confirmation alert message when restoring a soft-deleted cipher.</comment>
+  </data>
+  <data name="DoYouReallyWantToSoftDeleteCipher" xml:space="preserve">
+    <value>Sei sicuro di voler spostare l'elemento nel cestino?</value>
+    <comment>Confirmation alert message when soft-deleting a cipher.</comment>
+  </data>
+  <data name="BiometricInvalidated" xml:space="preserve">
+    <value>Dati biometrici modificati, accedi con la password principale per attivare nuovamente lo sblocco con dati biometrici.</value>
+  </data>
+  <data name="EnableSyncOnRefresh" xml:space="preserve">
+    <value>Abilita la sincronizzazione durante l'aggiornamento</value>
+  </data>
+  <data name="EnableSyncOnRefreshDescription" xml:space="preserve">
+    <value>Sincronizza la cassaforte trascinando verso il basso.</value>
+  </data>
+  <data name="LogInSso" xml:space="preserve">
+    <value>Accesso con il portale dell'organizzazione (Single Sign-On)</value>
+  </data>
+  <data name="LogInSsoSummary" xml:space="preserve">
+    <value>Accedi usando il portale di accesso (Single Sign On) della tua organizzazione. Inserisci l'identificativo della tua organizzazione per iniziare.</value>
+  </data>
+  <data name="OrgIdentifier" xml:space="preserve">
+    <value>Identificativo dell'organizzazione</value>
+  </data>
+  <data name="LoginSsoError" xml:space="preserve">
+    <value>Attualmente non sei in grado di effettuare il login con SSO</value>
+  </data>
+  <data name="SetMasterPassword" xml:space="preserve">
+    <value>Impostare la password principale</value>
+  </data>
+  <data name="SetMasterPasswordSummary" xml:space="preserve">
+    <value>Per completare il login con SSO, si prega di impostare una password principale per accedere e proteggere la cassaforte.</value>
+  </data>
+  <data name="MasterPasswordPolicyInEffect" xml:space="preserve">
+    <value>La password principale deve avere i seguenti requisiti, stabiliti da una o più regole dell'organizzazione:</value>
+  </data>
+  <data name="PolicyInEffectMinComplexity" xml:space="preserve">
+    <value>Punteggio minimo di complessità {0}</value>
+  </data>
+  <data name="PolicyInEffectMinLength" xml:space="preserve">
+    <value>La lunghezza minima {0}</value>
+  </data>
+  <data name="PolicyInEffectUppercase" xml:space="preserve">
+    <value>Contiene almeno un carattere maiuscolo</value>
+  </data>
+  <data name="PolicyInEffectLowercase" xml:space="preserve">
+    <value>Contiene almeno un carattere minuscolo</value>
+  </data>
+  <data name="PolicyInEffectNumbers" xml:space="preserve">
+    <value>Contiene almeno una cifra</value>
+  </data>
+  <data name="PolicyInEffectSpecial" xml:space="preserve">
+    <value>Contiene almeno uno dei seguenti caratteri speciali: {0}</value>
+  </data>
+  <data name="MasterPasswordPolicyValidationTitle" xml:space="preserve">
+    <value>Password non valida</value>
+  </data>
+  <data name="MasterPasswordPolicyValidationMessage" xml:space="preserve">
+    <value>La password non soddisfa i requisiti dell'organizzazione. Si prega di controllare i criteri password dell'organizzazione e riprovare.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Caricamento</value>
   </data>
 </root>

@@ -18,10 +18,12 @@ namespace Bit.Core.Models.View
             Favorite = c.Favorite;
             OrganizationUseTotp = c.OrganizationUseTotp;
             Edit = c.Edit;
+            ViewPassword = c.ViewPassword;
             Type = c.Type;
             LocalData = c.LocalData;
             CollectionIds = c.CollectionIds;
             RevisionDate = c.RevisionDate;
+            DeletedDate = c.DeletedDate;
         }
 
         public string Id { get; set; }
@@ -33,6 +35,7 @@ namespace Bit.Core.Models.View
         public bool Favorite { get; set; }
         public bool OrganizationUseTotp { get; set; }
         public bool Edit { get; set; }
+        public bool ViewPassword { get; set; } = true;
         public Dictionary<string, object> LocalData { get; set; }
         public LoginView Login { get; set; }
         public IdentityView Identity { get; set; }
@@ -43,13 +46,14 @@ namespace Bit.Core.Models.View
         public List<PasswordHistoryView> PasswordHistory { get; set; }
         public HashSet<string> CollectionIds { get; set; }
         public DateTime RevisionDate { get; set; }
+        public DateTime? DeletedDate { get; set; }
 
 
         public string SubTitle
         {
             get
             {
-                switch(Type)
+                switch (Type)
                 {
                     case CipherType.Login:
                         return Login.SubTitle;
@@ -73,7 +77,7 @@ namespace Bit.Core.Models.View
         {
             get
             {
-                if(HasAttachments)
+                if (HasAttachments)
                 {
                     return Attachments.Any(a => a.Key == null);
                 }
@@ -85,16 +89,17 @@ namespace Bit.Core.Models.View
         {
             get
             {
-                if(Type != CipherType.Login || Login == null)
+                if (Type != CipherType.Login || Login == null)
                 {
                     return null;
                 }
-                else if(string.IsNullOrWhiteSpace(Login.Password))
+                else if (string.IsNullOrWhiteSpace(Login.Password))
                 {
                     return null;
                 }
                 return Login.PasswordRevisionDate;
             }
         }
+        public bool IsDeleted => DeletedDate.HasValue;
     }
 }

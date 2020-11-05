@@ -1,9 +1,9 @@
 ﻿using Bit.App.Models;
-using Bit.Core;
 using Bit.Core.Abstractions;
 using Bit.Core.Utilities;
 using System;
 using System.Threading.Tasks;
+using Bit.App.Utilities;
 using Xamarin.Forms;
 
 namespace Bit.App.Pages
@@ -12,17 +12,17 @@ namespace Bit.App.Pages
     {
         private readonly IStorageService _storageService;
         private readonly AppOptions _appOptions;
-        private readonly bool _autoPromptFingerprint;
+        private readonly bool _autoPromptBiometric;
         private readonly LockPageViewModel _vm;
 
         private bool _promptedAfterResume;
         private bool _appeared;
 
-        public LockPage(AppOptions appOptions = null, bool autoPromptFingerprint = true)
+        public LockPage(AppOptions appOptions = null, bool autoPromptBiometric = true)
         {
             _storageService = ServiceContainer.Resolve<IStorageService>("storageService");
             _appOptions = appOptions;
-            _autoPromptFingerprint = autoPromptFingerprint;
+            _autoPromptBiometric = autoPromptBiometric;
             InitializeComponent();
             _vm = BindingContext as LockPageViewModel;
             _vm.Page = this;
@@ -34,15 +34,15 @@ namespace Bit.App.Pages
         public Entry MasterPasswordEntry { get; set; }
         public Entry PinEntry { get; set; }
 
-        public async Task PromptFingerprintAfterResumeAsync()
+        public async Task PromptBiometricAfterResumeAsync()
         {
-            if(_vm.FingerprintLock)
+            if (_vm.BiometricLock)
             {
                 await Task.Delay(500);
-                if(!_promptedAfterResume)
+                if (!_promptedAfterResume)
                 {
                     _promptedAfterResume = true;
-                    await _vm?.PromptFingerprintAsync();
+                    await _vm?.PromptBiometricAsync();
                 }
             }
         }
@@ -50,15 +50,15 @@ namespace Bit.App.Pages
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            if(_appeared)
+            if (_appeared)
             {
                 return;
             }
             _appeared = true;
-            await _vm.InitAsync(_autoPromptFingerprint);
-            if(!_vm.FingerprintLock)
+            await _vm.InitAsync(_autoPromptBiometric);
+            if (!_vm.BiometricLock)
             {
-                if(_vm.PinLock)
+                if (_vm.PinLock)
                 {
                     RequestFocus(PinEntry);
                 }
@@ -71,7 +71,7 @@ namespace Bit.App.Pages
 
         private void Unlock_Clicked(object sender, EventArgs e)
         {
-            if(DoOnce())
+            if (DoOnce())
             {
                 var tasks = Task.Run(async () =>
                 {
@@ -83,40 +83,27 @@ namespace Bit.App.Pages
 
         private async void LogOut_Clicked(object sender, EventArgs e)
         {
-            if(DoOnce())
+            if (DoOnce())
             {
                 await _vm.LogOutAsync();
             }
         }
 
-        private async void Fingerprint_Clicked(object sender, EventArgs e)
+        private async void Biometric_Clicked(object sender, EventArgs e)
         {
-            if(DoOnce())
+            if (DoOnce())
             {
-                await _vm.PromptFingerprintAsync();
+                await _vm.PromptBiometricAsync();
             }
         }
 
         private async Task UnlockedAsync()
         {
-            if(_appOptions != null)
+            if (AppHelpers.SetAlternateMainPage(_appOptions))
             {
-                if(_appOptions.FromAutofillFramework && _appOptions.SaveType.HasValue)
-                {
-                    Application.Current.MainPage = new NavigationPage(new AddEditPage(appOptions: _appOptions));
-                    return;
-                }
-                else if(_appOptions.Uri != null)
-                {
-                    Application.Current.MainPage = new NavigationPage(new AutofillCiphersPage(_appOptions));
-                    return;
-                }
+                return;
             }
-            var previousPage = await _storageService.GetAsync<PreviousPageInfo>(Constants.PreviousPageKey);
-            if(previousPage != null)
-            {
-                await _storageService.RemoveAsync(Constants.PreviousPageKey);
-            }
+            var previousPage = await AppHelpers.ClearPreviousPage();
             Application.Current.MainPage = new TabsPage(_appOptions, previousPage);
         }
     }

@@ -37,14 +37,15 @@ namespace Bit.Droid
         public MainApplication(IntPtr handle, JniHandleOwnership transer)
           : base(handle, transer)
         {
-            if(ServiceContainer.RegisteredServices.Count == 0)
+            if (ServiceContainer.RegisteredServices.Count == 0)
             {
                 RegisterLocalServices();
                 var deviceActionService = ServiceContainer.Resolve<IDeviceActionService>("deviceActionService");
-                ServiceContainer.Init(deviceActionService.DeviceUserAgent);
+                ServiceContainer.Init(deviceActionService.DeviceUserAgent, Constants.ClearCiphersCacheKey,
+                    Constants.AndroidAllClearCipherCacheKeys);
             }
 #if !FDROID
-            if(Build.VERSION.SdkInt <= BuildVersionCodes.Kitkat)
+            if (Build.VERSION.SdkInt <= BuildVersionCodes.Kitkat)
             {
                 ProviderInstaller.InstallIfNeededAsync(ApplicationContext, this);
             }
@@ -70,7 +71,6 @@ namespace Bit.Droid
         {
             ServiceContainer.Register<ILogService>("logService", new AndroidLogService());
 
-            Refractored.FabControl.Droid.FloatingActionButtonViewRenderer.Init();
             // Note: This might cause a race condition. Investigate more.
             Task.Run(() =>
             {
@@ -83,7 +83,6 @@ namespace Bit.Droid
                 ZXing.Net.Mobile.Forms.Android.Platform.Init();
             });
             CrossFingerprint.SetCurrentActivityResolver(() => CrossCurrentActivity.Current.Activity);
-            CrossFingerprint.SetDialogFragmentType<CustomFingerprintDialogFragment>();
 
             var preferencesStorage = new PreferencesStorageService(null);
             var documentsPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
@@ -100,6 +99,7 @@ namespace Bit.Droid
                 broadcasterService, () => ServiceContainer.Resolve<IEventService>("eventService"));
             var platformUtilsService = new MobilePlatformUtilsService(deviceActionService, messagingService,
                 broadcasterService);
+            var biometricService = new BiometricService();
 
             ServiceContainer.Register<IBroadcasterService>("broadcasterService", broadcasterService);
             ServiceContainer.Register<IMessagingService>("messagingService", messagingService);
@@ -110,6 +110,7 @@ namespace Bit.Droid
             ServiceContainer.Register<IStorageService>("secureStorageService", secureStorageService);
             ServiceContainer.Register<IDeviceActionService>("deviceActionService", deviceActionService);
             ServiceContainer.Register<IPlatformUtilsService>("platformUtilsService", platformUtilsService);
+            ServiceContainer.Register<IBiometricService>("biometricService", biometricService);
 
             // Push
 #if FDROID

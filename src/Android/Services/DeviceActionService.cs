@@ -8,20 +8,18 @@ using Android.App;
 using Android.App.Assist;
 using Android.Content;
 using Android.Content.PM;
-using Android.Hardware.Biometrics;
-using Android.Hardware.Fingerprints;
+using Android.Content.Res;
 using Android.Nfc;
 using Android.OS;
 using Android.Provider;
-using Android.Runtime;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
 using Android.Text;
 using Android.Text.Method;
 using Android.Views.Autofill;
 using Android.Views.InputMethods;
 using Android.Webkit;
 using Android.Widget;
+using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using Bit.App.Abstractions;
 using Bit.App.Resources;
 using Bit.Core;
@@ -31,7 +29,6 @@ using Bit.Core.Models.View;
 using Bit.Core.Utilities;
 using Bit.Droid.Autofill;
 using Plugin.CurrentActivity;
-using Plugin.Fingerprint;
 
 namespace Bit.Droid.Services
 {
@@ -59,7 +56,7 @@ namespace Bit.Droid.Services
 
             _broadcasterService.Subscribe(nameof(DeviceActionService), (message) =>
             {
-                if(message.Command == "selectFileCameraPermissionDenied")
+                if (message.Command == "selectFileCameraPermissionDenied")
                 {
                     _cameraPermissionsDenied = true;
                 }
@@ -70,7 +67,7 @@ namespace Bit.Droid.Services
         {
             get
             {
-                if(string.IsNullOrWhiteSpace(_userAgent))
+                if (string.IsNullOrWhiteSpace(_userAgent))
                 {
                     _userAgent = $"Bitwarden_Mobile/{Xamarin.Essentials.AppInfo.VersionString} " +
                         $"(Android {Build.VERSION.Release}; SDK {Build.VERSION.Sdk}; Model {Build.Model})";
@@ -83,7 +80,7 @@ namespace Bit.Droid.Services
 
         public void Toast(string text, bool longDuration = false)
         {
-            if(_toast != null)
+            if (_toast != null)
             {
                 _toast.Cancel();
                 _toast.Dispose();
@@ -99,7 +96,7 @@ namespace Bit.Droid.Services
             var activity = CrossCurrentActivity.Current.Activity;
             appName = appName.Replace("androidapp://", string.Empty);
             var launchIntent = activity.PackageManager.GetLaunchIntentForPackage(appName);
-            if(launchIntent != null)
+            if (launchIntent != null)
             {
                 activity.StartActivity(launchIntent);
             }
@@ -108,7 +105,7 @@ namespace Bit.Droid.Services
 
         public async Task ShowLoadingAsync(string text)
         {
-            if(_progressDialog != null)
+            if (_progressDialog != null)
             {
                 await HideLoadingAsync();
             }
@@ -121,7 +118,7 @@ namespace Bit.Droid.Services
 
         public Task HideLoadingAsync()
         {
-            if(_progressDialog != null)
+            if (_progressDialog != null)
             {
                 _progressDialog.Dismiss();
                 _progressDialog.Dispose();
@@ -136,7 +133,7 @@ namespace Bit.Droid.Services
             {
                 var activity = (MainActivity)CrossCurrentActivity.Current.Activity;
                 var intent = BuildOpenFileIntent(fileData, fileName);
-                if(intent == null)
+                if (intent == null)
                 {
                     return false;
                 }
@@ -153,7 +150,7 @@ namespace Bit.Droid.Services
             {
                 var activity = (MainActivity)CrossCurrentActivity.Current.Activity;
                 var intent = BuildOpenFileIntent(new byte[0], string.Concat("opentest_", fileName));
-                if(intent == null)
+                if (intent == null)
                 {
                     return false;
                 }
@@ -168,12 +165,12 @@ namespace Bit.Droid.Services
         private Intent BuildOpenFileIntent(byte[] fileData, string fileName)
         {
             var extension = MimeTypeMap.GetFileExtensionFromUrl(fileName.Replace(' ', '_').ToLower());
-            if(extension == null)
+            if (extension == null)
             {
                 return null;
             }
             var mimeType = MimeTypeMap.Singleton.GetMimeTypeFromExtension(extension);
-            if(mimeType == null)
+            if (mimeType == null)
             {
                 return null;
             }
@@ -183,7 +180,7 @@ namespace Bit.Droid.Services
             var filePath = Path.Combine(cachePath.Path, fileName);
             File.WriteAllBytes(filePath, fileData);
             var file = new Java.IO.File(cachePath, fileName);
-            if(!file.IsFile)
+            if (!file.IsFile)
             {
                 return null;
             }
@@ -201,6 +198,54 @@ namespace Bit.Droid.Services
             return null;
         }
 
+        public bool SaveFile(byte[] fileData, string id, string fileName, string contentUri)
+        {
+            try
+            {
+                var activity = (MainActivity)CrossCurrentActivity.Current.Activity;
+
+                if (contentUri != null)
+                {
+                    var uri = Android.Net.Uri.Parse(contentUri);
+                    var stream = activity.ContentResolver.OpenOutputStream(uri);
+                    // Using java bufferedOutputStream due to this issue:
+                    // https://github.com/xamarin/xamarin-android/issues/3498
+                    var javaStream = new Java.IO.BufferedOutputStream(stream);
+                    javaStream.Write(fileData);
+                    javaStream.Flush();
+                    javaStream.Close();
+                    return true;
+                }
+
+                // Prompt for location to save file
+                var extension = MimeTypeMap.GetFileExtensionFromUrl(fileName.Replace(' ', '_').ToLower());
+                if (extension == null)
+                {
+                    return false;
+                }
+
+                string mimeType = MimeTypeMap.Singleton.GetMimeTypeFromExtension(extension);
+                if (mimeType == null)
+                {
+                    // Unable to identify so fall back to generic "any" type
+                    mimeType = "*/*";
+                }
+
+                var intent = new Intent(Intent.ActionCreateDocument);
+                intent.SetType(mimeType);
+                intent.AddCategory(Intent.CategoryOpenable);
+                intent.PutExtra(Intent.ExtraTitle, fileName);
+
+                activity.StartActivityForResult(intent, Constants.SaveFileRequestCode);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(">>> {0}: {1}", ex.GetType(), ex.StackTrace);
+            }
+            return false;
+        }
+
         public async Task ClearCacheAsync()
         {
             try
@@ -208,7 +253,7 @@ namespace Bit.Droid.Services
                 DeleteDir(CrossCurrentActivity.Current.Activity.CacheDir);
                 await _storageService.SaveAsync(Constants.LastFileCacheClearKey, DateTime.UtcNow);
             }
-            catch(Exception) { }
+            catch (Exception) { }
         }
 
         public Task SelectFileAsync()
@@ -217,25 +262,25 @@ namespace Bit.Droid.Services
             var hasStorageWritePermission = !_cameraPermissionsDenied &&
                 HasPermission(Manifest.Permission.WriteExternalStorage);
             var additionalIntents = new List<IParcelable>();
-            if(activity.PackageManager.HasSystemFeature(PackageManager.FeatureCamera))
+            if (activity.PackageManager.HasSystemFeature(PackageManager.FeatureCamera))
             {
                 var hasCameraPermission = !_cameraPermissionsDenied && HasPermission(Manifest.Permission.Camera);
-                if(!_cameraPermissionsDenied && !hasStorageWritePermission)
+                if (!_cameraPermissionsDenied && !hasStorageWritePermission)
                 {
                     AskPermission(Manifest.Permission.WriteExternalStorage);
                     return Task.FromResult(0);
                 }
-                if(!_cameraPermissionsDenied && !hasCameraPermission)
+                if (!_cameraPermissionsDenied && !hasCameraPermission)
                 {
                     AskPermission(Manifest.Permission.Camera);
                     return Task.FromResult(0);
                 }
-                if(!_cameraPermissionsDenied && hasCameraPermission && hasStorageWritePermission)
+                if (!_cameraPermissionsDenied && hasCameraPermission && hasStorageWritePermission)
                 {
                     try
                     {
                         var file = new Java.IO.File(activity.FilesDir, "temp_camera_photo.jpg");
-                        if(!file.Exists())
+                        if (!file.Exists())
                         {
                             file.ParentFile.Mkdirs();
                             file.CreateNewFile();
@@ -244,7 +289,7 @@ namespace Bit.Droid.Services
                             "com.x8bit.bitwarden.fileprovider", file);
                         additionalIntents.AddRange(GetCameraIntents(outputFileUri));
                     }
-                    catch(Java.IO.IOException) { }
+                    catch (Java.IO.IOException) { }
                 }
             }
 
@@ -252,7 +297,7 @@ namespace Bit.Droid.Services
             docIntent.AddCategory(Intent.CategoryOpenable);
             docIntent.SetType("*/*");
             var chooserIntent = Intent.CreateChooser(docIntent, AppResources.FileSource);
-            if(additionalIntents.Count > 0)
+            if (additionalIntents.Count > 0)
             {
                 chooserIntent.PutExtra(Intent.ExtraInitialIntents, additionalIntents.ToArray());
             }
@@ -265,7 +310,7 @@ namespace Bit.Droid.Services
             bool numericKeyboard = false, bool autofocus = true)
         {
             var activity = (MainActivity)CrossCurrentActivity.Current.Activity;
-            if(activity == null)
+            if (activity == null)
             {
                 return Task.FromResult<string>(null);
             }
@@ -277,11 +322,11 @@ namespace Bit.Droid.Services
             {
                 InputType = InputTypes.ClassText
             };
-            if(text == null)
+            if (text == null)
             {
                 text = string.Empty;
             }
-            if(numericKeyboard)
+            if (numericKeyboard)
             {
                 input.InputType = InputTypes.ClassNumber | InputTypes.NumberFlagDecimal | InputTypes.NumberFlagSigned;
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -311,7 +356,7 @@ namespace Bit.Droid.Services
             var alert = alertBuilder.Create();
             alert.Window.SetSoftInputMode(Android.Views.SoftInput.StateVisible);
             alert.Show();
-            if(autofocus)
+            if (autofocus)
             {
                 input.RequestFocus();
             }
@@ -326,7 +371,7 @@ namespace Bit.Droid.Services
                 var rateIntent = RateIntentForUrl("market://details", activity);
                 activity.StartActivity(rateIntent);
             }
-            catch(ActivityNotFoundException)
+            catch (ActivityNotFoundException)
             {
                 var rateIntent = RateIntentForUrl("https://play.google.com/store/apps/details", activity);
                 activity.StartActivity(rateIntent);
@@ -341,68 +386,14 @@ namespace Bit.Droid.Services
 
         public bool SupportsFaceBiometric()
         {
+            // only used by iOS
             return false;
         }
 
         public Task<bool> SupportsFaceBiometricAsync()
         {
+            // only used by iOS
             return Task.FromResult(SupportsFaceBiometric());
-        }
-
-        public async Task<bool> BiometricAvailableAsync()
-        {
-            if(UseNativeBiometric())
-            {
-                var activity = (MainActivity)CrossCurrentActivity.Current.Activity;
-                var manager = activity.GetSystemService(Context.BiometricService) as BiometricManager;
-                return manager.CanAuthenticate() == BiometricCode.Success;
-            }
-            else
-            {
-                try
-                {
-                    return await CrossFingerprint.Current.IsAvailableAsync();
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
-        public bool UseNativeBiometric()
-        {
-            return (int)Build.VERSION.SdkInt >= 29;
-        }
-
-        public Task<bool> AuthenticateBiometricAsync(string text = null)
-        {
-            if(string.IsNullOrWhiteSpace(text))
-            {
-                text = AppResources.BiometricsDirection;
-            }
-
-            var activity = (MainActivity)CrossCurrentActivity.Current.Activity;
-            using(var builder = new BiometricPrompt.Builder(activity))
-            {
-                builder.SetTitle(text);
-                builder.SetConfirmationRequired(false);
-                builder.SetNegativeButton(AppResources.Cancel, activity.MainExecutor,
-                    new DialogInterfaceOnClickListener
-                    {
-                        Clicked = () => { }
-                    });
-                var prompt = builder.Build();
-                var result = new TaskCompletionSource<bool>();
-                prompt.Authenticate(new CancellationSignal(), activity.MainExecutor,
-                    new BiometricAuthenticationCallback
-                    {
-                        Success = authResult => result.TrySetResult(true),
-                        Failed = () => result.TrySetResult(false),
-                        Help = (helpCode, helpString) => { }
-                    });
-                return result.Task;
-            }
         }
 
         public bool SupportsNfc()
@@ -420,7 +411,7 @@ namespace Bit.Droid.Services
 
         public bool SupportsAutofillService()
         {
-            if(Build.VERSION.SdkInt < BuildVersionCodes.O)
+            if (Build.VERSION.SdkInt < BuildVersionCodes.O)
             {
                 return false;
             }
@@ -450,7 +441,7 @@ namespace Bit.Droid.Services
         public Task<string> DisplayAlertAsync(string title, string message, string cancel, params string[] buttons)
         {
             var activity = (MainActivity)CrossCurrentActivity.Current.Activity;
-            if(activity == null)
+            if (activity == null)
             {
                 return Task.FromResult<string>(null);
             }
@@ -459,11 +450,11 @@ namespace Bit.Droid.Services
             var alertBuilder = new AlertDialog.Builder(activity);
             alertBuilder.SetTitle(title);
 
-            if(!string.IsNullOrWhiteSpace(message))
+            if (!string.IsNullOrWhiteSpace(message))
             {
-                if(buttons != null && buttons.Length > 2)
+                if (buttons != null && buttons.Length > 2)
                 {
-                    if(!string.IsNullOrWhiteSpace(title))
+                    if (!string.IsNullOrWhiteSpace(title))
                     {
                         alertBuilder.SetTitle($"{title}: {message}");
                     }
@@ -478,9 +469,9 @@ namespace Bit.Droid.Services
                 }
             }
 
-            if(buttons != null)
+            if (buttons != null)
             {
-                if(buttons.Length > 2)
+                if (buttons.Length > 2)
                 {
                     alertBuilder.SetItems(buttons, (sender, args) =>
                     {
@@ -489,14 +480,14 @@ namespace Bit.Droid.Services
                 }
                 else
                 {
-                    if(buttons.Length > 0)
+                    if (buttons.Length > 0)
                     {
                         alertBuilder.SetPositiveButton(buttons[0], (sender, args) =>
                         {
                             result.TrySetResult(buttons[0]);
                         });
                     }
-                    if(buttons.Length > 1)
+                    if (buttons.Length > 1)
                     {
                         alertBuilder.SetNeutralButton(buttons[1], (sender, args) =>
                         {
@@ -506,7 +497,7 @@ namespace Bit.Droid.Services
                 }
             }
 
-            if(!string.IsNullOrWhiteSpace(cancel))
+            if (!string.IsNullOrWhiteSpace(cancel))
             {
                 alertBuilder.SetNegativeButton(cancel, (sender, args) =>
                 {
@@ -520,16 +511,23 @@ namespace Bit.Droid.Services
             return result.Task;
         }
 
+        public async Task<string> DisplayActionSheetAsync(string title, string cancel, string destruction,
+            params string[] buttons)
+        {
+            return await Xamarin.Forms.Application.Current.MainPage.DisplayActionSheet(
+                title, cancel, destruction, buttons);
+        }
+
         public void Autofill(CipherView cipher)
         {
             var activity = (MainActivity)CrossCurrentActivity.Current.Activity;
-            if(activity == null)
+            if (activity == null)
             {
                 return;
             }
-            if(activity.Intent.GetBooleanExtra("autofillFramework", false))
+            if (activity.Intent.GetBooleanExtra("autofillFramework", false))
             {
-                if(cipher == null)
+                if (cipher == null)
                 {
                     activity.SetResult(Result.Canceled);
                     activity.Finish();
@@ -537,7 +535,7 @@ namespace Bit.Droid.Services
                 }
                 var structure = activity.Intent.GetParcelableExtra(
                     AutofillManager.ExtraAssistStructure) as AssistStructure;
-                if(structure == null)
+                if (structure == null)
                 {
                     activity.SetResult(Result.Canceled);
                     activity.Finish();
@@ -545,7 +543,7 @@ namespace Bit.Droid.Services
                 }
                 var parser = new Parser(structure, activity.ApplicationContext);
                 parser.Parse();
-                if((!parser.FieldCollection?.Fields?.Any() ?? true) || string.IsNullOrWhiteSpace(parser.Uri))
+                if ((!parser.FieldCollection?.Fields?.Any() ?? true) || string.IsNullOrWhiteSpace(parser.Uri))
                 {
                     activity.SetResult(Result.Canceled);
                     activity.Finish();
@@ -562,7 +560,7 @@ namespace Bit.Droid.Services
             else
             {
                 var data = new Intent();
-                if(cipher == null)
+                if (cipher == null)
                 {
                     data.PutExtra("canceled", "true");
                 }
@@ -573,7 +571,7 @@ namespace Bit.Droid.Services
                     data.PutExtra("username", cipher.Login.Username);
                     data.PutExtra("password", cipher.Login.Password);
                 }
-                if(activity.Parent == null)
+                if (activity.Parent == null)
                 {
                     activity.SetResult(Result.Ok, data);
                 }
@@ -583,7 +581,7 @@ namespace Bit.Droid.Services
                 }
                 activity.Finish();
                 _messagingService.Send("finishMainActivity");
-                if(cipher != null)
+                if (cipher != null)
                 {
                     var eventTask = _eventServiceFunc().CollectAsync(EventType.Cipher_ClientAutofilled, cipher.Id);
                 }
@@ -598,7 +596,7 @@ namespace Bit.Droid.Services
         public void Background()
         {
             var activity = (MainActivity)CrossCurrentActivity.Current.Activity;
-            if(activity.Intent.GetBooleanExtra("autofillFramework", false))
+            if (activity.Intent.GetBooleanExtra("autofillFramework", false))
             {
                 activity.SetResult(Result.Canceled);
                 activity.Finish();
@@ -639,7 +637,7 @@ namespace Bit.Droid.Services
                 intent.SetData(Android.Net.Uri.Parse("package:com.x8bit.bitwarden"));
                 activity.StartActivity(intent);
             }
-            catch(ActivityNotFoundException)
+            catch (ActivityNotFoundException)
             {
                 // can't open overlay permission management, fall back to app settings
                 var intent = new Intent(Settings.ActionApplicationDetailsSettings);
@@ -661,7 +659,7 @@ namespace Bit.Droid.Services
 
         public bool AutofillServiceEnabled()
         {
-            if(Build.VERSION.SdkInt < BuildVersionCodes.O)
+            if (Build.VERSION.SdkInt < BuildVersionCodes.O)
             {
                 return false;
             }
@@ -698,7 +696,7 @@ namespace Bit.Droid.Services
                 intent.SetData(Android.Net.Uri.Parse("package:com.x8bit.bitwarden"));
                 activity.StartActivity(intent);
             }
-            catch(ActivityNotFoundException)
+            catch (ActivityNotFoundException)
             {
                 var alertBuilder = new AlertDialog.Builder(activity);
                 alertBuilder.SetMessage(AppResources.BitwardenAutofillGoToSettings);
@@ -713,25 +711,35 @@ namespace Bit.Droid.Services
 
         public bool UsingDarkTheme()
         {
+            try
+            {
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.Q)
+                {
+                    var app = CrossCurrentActivity.Current.AppContext;
+                    var uiModeFlags = app.Resources.Configuration.UiMode & UiMode.NightMask;
+                    return uiModeFlags == UiMode.NightYes;
+                }
+            }
+            catch { }
             return false;
         }
 
         private bool DeleteDir(Java.IO.File dir)
         {
-            if(dir != null && dir.IsDirectory)
+            if (dir != null && dir.IsDirectory)
             {
                 var children = dir.List();
-                for(int i = 0; i < children.Length; i++)
+                for (int i = 0; i < children.Length; i++)
                 {
                     var success = DeleteDir(new Java.IO.File(dir, children[i]));
-                    if(!success)
+                    if (!success)
                     {
                         return false;
                     }
                 }
                 return dir.Delete();
             }
-            else if(dir != null && dir.IsFile)
+            else if (dir != null && dir.IsFile)
             {
                 return dir.Delete();
             }
@@ -759,7 +767,7 @@ namespace Bit.Droid.Services
             var pm = CrossCurrentActivity.Current.Activity.PackageManager;
             var captureIntent = new Intent(MediaStore.ActionImageCapture);
             var listCam = pm.QueryIntentActivities(captureIntent, 0);
-            foreach(var res in listCam)
+            foreach (var res in listCam)
             {
                 var packageName = res.ActivityInfo.PackageName;
                 var intent = new Intent(captureIntent);
@@ -775,7 +783,7 @@ namespace Bit.Droid.Services
         {
             var intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse($"{url}?id={activity.PackageName}"));
             var flags = ActivityFlags.NoHistory | ActivityFlags.MultipleTask;
-            if((int)Build.VERSION.SdkInt >= 21)
+            if ((int)Build.VERSION.SdkInt >= 21)
             {
                 flags |= ActivityFlags.NewDocument;
             }
@@ -790,16 +798,16 @@ namespace Bit.Droid.Services
 
         private async Task CopyTotpAsync(CipherView cipher)
         {
-            if(!string.IsNullOrWhiteSpace(cipher?.Login?.Totp))
+            if (!string.IsNullOrWhiteSpace(cipher?.Login?.Totp))
             {
                 var userService = ServiceContainer.Resolve<IUserService>("userService");
                 var autoCopyDisabled = await _storageService.GetAsync<bool?>(Constants.DisableAutoTotpCopyKey);
                 var canAccessPremium = await userService.CanAccessPremiumAsync();
-                if((canAccessPremium || cipher.OrganizationUseTotp) && !autoCopyDisabled.GetValueOrDefault())
+                if ((canAccessPremium || cipher.OrganizationUseTotp) && !autoCopyDisabled.GetValueOrDefault())
                 {
                     var totpService = ServiceContainer.Resolve<ITotpService>("totpService");
                     var totp = await totpService.GetCodeAsync(cipher.Login.Totp);
-                    if(totp != null)
+                    if (totp != null)
                     {
                         CopyToClipboard(totp);
                     }
@@ -812,43 +820,7 @@ namespace Bit.Droid.Services
             var activity = (MainActivity)CrossCurrentActivity.Current.Activity;
             var clipboardManager = activity.GetSystemService(
                 Context.ClipboardService) as Android.Content.ClipboardManager;
-            clipboardManager.Text = text;
-        }
-
-        private class BiometricAuthenticationCallback : BiometricPrompt.AuthenticationCallback
-        {
-            public Action<BiometricPrompt.AuthenticationResult> Success { get; set; }
-            public Action Failed { get; set; }
-            public Action<BiometricAcquiredStatus, Java.Lang.ICharSequence> Help { get; set; }
-
-            public override void OnAuthenticationSucceeded(BiometricPrompt.AuthenticationResult authResult)
-            {
-                base.OnAuthenticationSucceeded(authResult);
-                Success?.Invoke(authResult);
-            }
-
-            public override void OnAuthenticationFailed()
-            {
-                base.OnAuthenticationFailed();
-                Failed?.Invoke();
-            }
-
-            public override void OnAuthenticationHelp([GeneratedEnum] BiometricAcquiredStatus helpCode,
-                Java.Lang.ICharSequence helpString)
-            {
-                base.OnAuthenticationHelp(helpCode, helpString);
-                Help?.Invoke(helpCode, helpString);
-            }
-        }
-
-        private class DialogInterfaceOnClickListener : Java.Lang.Object, IDialogInterfaceOnClickListener
-        {
-            public Action Clicked { get; set; }
-
-            public void OnClick(IDialogInterface dialog, int which)
-            {
-                Clicked?.Invoke();
-            }
+            clipboardManager.PrimaryClip = ClipData.NewPlainText("bitwarden", text);
         }
     }
 }

@@ -11,12 +11,13 @@ namespace Bit.iOS.Core.Utilities
         public static UIColor BackgroundColor = Xamarin.Forms.Color.FromHex("#ffffff").ToUIColor();
         public static UIColor MutedColor = Xamarin.Forms.Color.FromHex("#777777").ToUIColor();
         public static UIColor SuccessColor = Xamarin.Forms.Color.FromHex("#00a65a").ToUIColor();
-        public static UIColor PrimaryColor = Xamarin.Forms.Color.FromHex("#3c8dbc").ToUIColor();
+        public static UIColor DangerColor = Xamarin.Forms.Color.FromHex("dd4b39").ToUIColor();
+        public static UIColor PrimaryColor = Xamarin.Forms.Color.FromHex("#175DDC").ToUIColor();
         public static UIColor TextColor = Xamarin.Forms.Color.FromHex("#000000").ToUIColor();
         public static UIColor PlaceholderColor = Xamarin.Forms.Color.FromHex("#d0d0d0").ToUIColor();
         public static UIColor SeparatorColor = Xamarin.Forms.Color.FromHex("#dddddd").ToUIColor();
         public static UIColor ListHeaderBackgroundColor = Xamarin.Forms.Color.FromHex("#efeff4").ToUIColor();
-        public static UIColor NavBarBackgroundColor = Xamarin.Forms.Color.FromHex("#3c8dbc").ToUIColor();
+        public static UIColor NavBarBackgroundColor = Xamarin.Forms.Color.FromHex("#175DDC").ToUIColor();
         public static UIColor NavBarTextColor = Xamarin.Forms.Color.FromHex("#ffffff").ToUIColor();
 
         public static void SetAppearance(string theme, bool usingOsDarkTheme)
@@ -26,7 +27,7 @@ namespace Bit.iOS.Core.Utilities
             UINavigationBar.Appearance.ShadowImage = new UIImage();
             UINavigationBar.Appearance.SetBackgroundImage(new UIImage(), UIBarMetrics.Default);
             UIStepper.Appearance.TintColor = MutedColor;
-            if(!LightTheme)
+            if (!LightTheme)
             {
                 UISwitch.Appearance.TintColor = MutedColor;
             }
@@ -55,20 +56,27 @@ namespace Bit.iOS.Core.Utilities
             UIButton.Appearance.TintColor = TextColor;
             UILabel.AppearanceWhenContainedIn(typeof(UITableViewHeaderFooterView)).TextColor = MutedColor;
         }
+        
+        public static UIFont GetDangerFont()
+        {
+            return Xamarin.Forms.Font.SystemFontOfSize(Xamarin.Forms.NamedSize.Small, 
+                Xamarin.Forms.FontAttributes.Bold).ToUIFont();
+        }
 
         private static void SetThemeVariables(string theme)
         {
             LightTheme = false;
-            if(string.IsNullOrWhiteSpace(theme) && UsingOsDarkTheme)
+            if (string.IsNullOrWhiteSpace(theme) && UsingOsDarkTheme)
             {
                 theme = "dark";
             }
 
-            if(theme == "dark")
+            if (theme == "dark")
             {
                 var whiteColor = Xamarin.Forms.Color.FromHex("#ffffff").ToUIColor();
                 MutedColor = Xamarin.Forms.Color.FromHex("#a3a3a3").ToUIColor();
                 SuccessColor = Xamarin.Forms.Color.FromHex("#00a65a").ToUIColor();
+                DangerColor = Xamarin.Forms.Color.FromHex("ff3e24").ToUIColor();
                 BackgroundColor = Xamarin.Forms.Color.FromHex("#303030").ToUIColor();
                 SplashBackgroundColor = Xamarin.Forms.Color.FromHex("#222222").ToUIColor();
                 PrimaryColor = Xamarin.Forms.Color.FromHex("#52bdfb").ToUIColor();
@@ -79,12 +87,13 @@ namespace Bit.iOS.Core.Utilities
                 NavBarBackgroundColor = Xamarin.Forms.Color.FromHex("#212121").ToUIColor();
                 NavBarTextColor = whiteColor;
             }
-            else if(theme == "black")
+            else if (theme == "black")
             {
                 var blackColor = Xamarin.Forms.Color.FromHex("#000000").ToUIColor();
                 var whiteColor = Xamarin.Forms.Color.FromHex("#ffffff").ToUIColor();
                 MutedColor = Xamarin.Forms.Color.FromHex("#a3a3a3").ToUIColor();
                 SuccessColor = Xamarin.Forms.Color.FromHex("#00a65a").ToUIColor();
+                DangerColor = Xamarin.Forms.Color.FromHex("ff3e24").ToUIColor();
                 BackgroundColor = blackColor;
                 SplashBackgroundColor = blackColor;
                 PrimaryColor = Xamarin.Forms.Color.FromHex("#52bdfb").ToUIColor();
@@ -95,10 +104,11 @@ namespace Bit.iOS.Core.Utilities
                 NavBarBackgroundColor = blackColor;
                 NavBarTextColor = whiteColor;
             }
-            else if(theme == "nord")
+            else if (theme == "nord")
             {
                 MutedColor = Xamarin.Forms.Color.FromHex("#d8dee9").ToUIColor();
                 SuccessColor = Xamarin.Forms.Color.FromHex("#a3be8c").ToUIColor();
+                DangerColor = Xamarin.Forms.Color.FromHex("bf616a").ToUIColor();
                 BackgroundColor = Xamarin.Forms.Color.FromHex("#3b4252").ToUIColor();
                 SplashBackgroundColor = Xamarin.Forms.Color.FromHex("#2e3440").ToUIColor();
                 PrimaryColor = Xamarin.Forms.Color.FromHex("#81a1c1").ToUIColor();
